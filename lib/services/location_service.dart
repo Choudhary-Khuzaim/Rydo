@@ -21,9 +21,18 @@ class LocationService {
 
     if (permission == LocationPermission.deniedForever) {
       return Future.error(
-          'Location permissions are permanently denied, we cannot request permissions.');
+        'Location permissions are permanently denied, we cannot request permissions.',
+      );
     }
 
     return await Geolocator.getCurrentPosition();
+  }
+
+  Stream<Position> getPositionStream() {
+    const LocationSettings locationSettings = LocationSettings(
+      accuracy: LocationAccuracy.high,
+      distanceFilter: 10, // Update every 10 meters
+    );
+    return Geolocator.getPositionStream(locationSettings: locationSettings);
   }
 }

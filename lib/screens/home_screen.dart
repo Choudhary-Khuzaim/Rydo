@@ -1,11 +1,16 @@
+import 'dart:async';
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:flutter_map/flutter_map.dart';
+import 'package:latlong2/latlong.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:rydo/services/location_service.dart';
 import 'package:rydo/screens/search_screen.dart';
 import 'package:rydo/widgets/ride_selection_sheet.dart';
 import 'package:rydo/screens/finding_driver_screen.dart';
 import 'package:rydo/screens/driver_details_screen.dart';
+import 'package:rydo/apis/osm_api.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -15,56 +20,94 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  GoogleMapController? _mapController;
+  final MapController _mapController = MapController();
   final LocationService _locationService = LocationService();
   LatLng? _currentPosition;
-  Set<Marker> _markers = {};
-  Set<Polyline> _polylines = {};
+  List<Marker> _markers = [];
+  List<Polyline> _polylines = [];
   bool _showFarePanel = false;
-  String? _destinationName;
+  bool _isLocating = false;
+  StreamSubscription<Position>? _positionSubscription;
 
-  static const CameraPosition _kGooglePlex = CameraPosition(
-    target: LatLng(37.42796133580664, -122.085749655962),
-    zoom: 14.4746,
+  static const LatLng _kDefaultLocation = LatLng(
+    37.42796133580664,
+    -122.085749655962,
   );
 
   @override
   void initState() {
     super.initState();
-    _getCurrentLocation();
+    _markers = [];
+    _polylines = [];
+    _startLocationUpdates();
+  }
+
+  @override
+  void dispose() {
+    _positionSubscription?.cancel();
+    super.dispose();
+  }
+
+  Future<void> _startLocationUpdates() async {
+    setState(() => _isLocating = true);
+    try {
+      // Ensure permissions and get initial position
+      Position position = await _locationService.determinePosition();
+      _updateUserMarker(position);
+      _mapController.move(_currentPosition!, 15);
+
+      // Start listening for live updates
+      _positionSubscription = _locationService.getPositionStream().listen((
+        position,
+      ) {
+        if (mounted) {
+          _updateUserMarker(position);
+        }
+      });
+
+      if (mounted) setState(() => _isLocating = false);
+    } catch (e) {
+      debugPrint("Location Error: $e");
+      if (mounted) {
+        setState(() => _isLocating = false);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Location Error: ${e.toString()}")),
+        );
+      }
+    }
+  }
+
+  void _updateUserMarker(Position position) {
+    setState(() {
+      _currentPosition = LatLng(position.latitude, position.longitude);
+
+      // Update or add the user location marker
+      // We keep the first marker as the user's location
+      final userMarker = Marker(
+        point: _currentPosition!,
+        width: 80,
+        height: 80,
+        child: const Icon(
+          Icons.location_history, // Changed to a more "live" indicator
+          color: Colors.blue,
+          size: 40,
+        ),
+      );
+
+      if (_markers.isEmpty) {
+        _markers.add(userMarker);
+      } else {
+        _markers[0] = userMarker;
+      }
+    });
   }
 
   Future<void> _getCurrentLocation() async {
-    try {
-      Position position = await _locationService.determinePosition();
-      if (mounted) {
-        setState(() {
-          _currentPosition = LatLng(position.latitude, position.longitude);
-          _markers.add(
-            Marker(
-              markerId: const MarkerId('currentLocation'),
-              position: _currentPosition!,
-              infoWindow: const InfoWindow(title: 'My Location'),
-              icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueBlue),
-            ),
-          );
-        });
-        _mapController?.animateCamera(
-          CameraUpdate.newCameraPosition(
-            CameraPosition(
-              target: _currentPosition!,
-              zoom: 15,
-            ),
-          ),
-        );
-      }
-    } catch (e) {
-      debugPrint(e.toString());
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(e.toString())),
-        );
-      }
+    // If we already have a position, just move back to it
+    if (_currentPosition != null) {
+      _mapController.move(_currentPosition!, 15);
+    } else {
+      await _startLocationUpdates();
     }
   }
 
@@ -75,73 +118,73 @@ class _HomeScreenState extends State<HomeScreen> {
     );
 
     if (result != null && _currentPosition != null) {
-      // Mocking coordinates for the selected result since we don't have Geocoding API
-      // Creating a destination slightly offset from current location
+      // Mocking coordinates for the selected result
       LatLng destination = LatLng(
         _currentPosition!.latitude + 0.01,
         _currentPosition!.longitude + 0.01,
       );
 
       setState(() {
-        _destinationName = result;
+        // _destinationName = result; // Removed
         _showFarePanel = true;
         _markers.add(
           Marker(
-            markerId: const MarkerId('destination'),
-            position: destination,
-            infoWindow: InfoWindow(title: result),
+            point: destination,
+            width: 80,
+            height: 80,
+            child: const Icon(Icons.location_on, color: Colors.red, size: 40),
           ),
         );
         _polylines.add(
           Polyline(
-            polylineId: const PolylineId('route'),
             points: [_currentPosition!, destination],
             color: Colors.black,
-            width: 5,
+            strokeWidth: 5,
           ),
         );
       });
 
-      // Zoom to fit both markers
-      LatLngBounds bounds = LatLngBounds(
-        southwest: LatLng(
-          _currentPosition!.latitude < destination.latitude ? _currentPosition!.latitude : destination.latitude,
-          _currentPosition!.longitude < destination.longitude ? _currentPosition!.longitude : destination.longitude,
+      _mapController.move(
+        LatLng(
+          (_currentPosition!.latitude + destination.latitude) / 2,
+          (_currentPosition!.longitude + destination.longitude) / 2,
         ),
-        northeast: LatLng(
-          _currentPosition!.latitude > destination.latitude ? _currentPosition!.latitude : destination.latitude,
-          _currentPosition!.longitude > destination.longitude ? _currentPosition!.longitude : destination.longitude,
-        ),
+        13,
       );
-      _mapController?.animateCamera(CameraUpdate.newLatLngBounds(bounds, 100));
     }
   }
 
   void _onRideSelected(String rideType, double price) {
-    // 1. Show Finding Driver Screen
     Navigator.push(
       context,
       MaterialPageRoute(builder: (context) => const FindingDriverScreen()),
     );
 
-    // 2. Simulate delay then show Driver Details
     Future.delayed(const Duration(seconds: 4), () {
-      // Check if user is still on the FindingDriverScreen (mostly true unless they cancelled)
-      // For simplicity in this demo, we assume they didn't cancel for now, or we just push on top
-      // A robust app would check logic.
       if (mounted) {
         Navigator.pop(context); // Pop Finding Driver
         Navigator.push(
           context,
           MaterialPageRoute(builder: (context) => const DriverDetailsScreen()),
         ).then((_) {
-          // When DriverDetails is popped (Finished/Cancelled), reset state
           setState(() {
             _showFarePanel = false;
-            _destinationName = null;
+            // _destinationName = null; // Removed
             _polylines.clear();
-            // keep current location marker
-            _markers = {_markers.firstWhere((m) => m.markerId == const MarkerId('currentLocation'))};
+            if (_currentPosition != null) {
+              _markers = [
+                Marker(
+                  point: _currentPosition!,
+                  width: 80,
+                  height: 80,
+                  child: const Icon(
+                    Icons.location_on,
+                    color: Colors.blue,
+                    size: 40,
+                  ),
+                ),
+              ];
+            }
           });
         });
       }
@@ -152,31 +195,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       extendBodyBehindAppBar: true,
-      appBar: AppBar(
-        title: const Text("Rydo", style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        leading: Builder(
-          builder: (context) => Container(
-            margin: const EdgeInsets.all(8),
-            decoration: const BoxDecoration(
-              color: Colors.white,
-              shape: BoxShape.circle,
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black12,
-                  blurRadius: 5,
-                  spreadRadius: 1,
-                ),
-              ],
-            ),
-            child: IconButton(
-              icon: const Icon(Icons.menu, color: Colors.black),
-              onPressed: () => Scaffold.of(context).openDrawer(),
-            ),
-          ),
-        ),
-      ),
+      backgroundColor: Colors.white,
       drawer: Drawer(
         child: ListView(
           padding: EdgeInsets.zero,
@@ -200,7 +219,7 @@ class _HomeScreenState extends State<HomeScreen> {
               title: const Text('Payment'),
               onTap: () {},
             ),
-             ListTile(
+            ListTile(
               leading: const Icon(Icons.settings),
               title: const Text('Settings'),
               onTap: () {},
@@ -210,96 +229,176 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       body: Stack(
         children: [
-          GoogleMap(
-            mapType: MapType.normal,
-            initialCameraPosition: _kGooglePlex,
-            onMapCreated: (GoogleMapController controller) {
-              _mapController = controller;
-              // Set map style here if JSON is available
-              if (_currentPosition != null) {
-                _mapController!.animateCamera(
-                  CameraUpdate.newCameraPosition(
-                    CameraPosition(
-                      target: _currentPosition!,
-                      zoom: 15,
-                    ),
+          // 1. Map Layer
+          Positioned.fill(
+            child: GestureDetector(
+              onTap: () {
+                if (_showFarePanel) {
+                  setState(() {
+                    _showFarePanel = false;
+                    _polylines.clear();
+                    // Reset markers to just current location if needed,
+                    // but keeping it simple as per request "off ho jye"
+                  });
+                }
+              },
+              behavior:
+                  HitTestBehavior.opaque, // Ensure it catches taps accurately
+              child: FlutterMap(
+                mapController: _mapController,
+                options: MapOptions(
+                  initialCenter: _currentPosition ?? _kDefaultLocation,
+                  initialZoom: 15,
+                  onTap: (tapPosition, point) {
+                    // Also handle map tap specifically if the GestureDetector above doesn't catch it
+                    // due to FlutterMap consuming gestures.
+                    if (_showFarePanel) {
+                      setState(() {
+                        _showFarePanel = false;
+                        _polylines.clear();
+                      });
+                    }
+                  },
+                ),
+                children: [
+                  TileLayer(
+                    urlTemplate: OsmApi.tileUrl,
+                    userAgentPackageName: OsmApi.userAgent,
                   ),
-                );
-              }
-            },
-            markers: _markers,
-            polylines: _polylines,
-            myLocationEnabled: false, // Custom button used
-            myLocationButtonEnabled: false,
-            zoomControlsEnabled: false,
-            padding: EdgeInsets.only(bottom: _showFarePanel ? 350 : 0), // Adjust padding for taller sheet
-          ),
-           if (!_showFarePanel)
-            Positioned(
-              bottom: 30,
-              right: 20,
-              child: FloatingActionButton(
-                onPressed: _getCurrentLocation,
-                backgroundColor: Colors.white,
-                foregroundColor: Colors.black,
-                elevation: 4,
-                child: const Icon(Icons.my_location),
+                  PolylineLayer(polylines: _polylines),
+                  MarkerLayer(markers: _markers),
+                ],
               ),
             ),
-          if (!_showFarePanel)
-            Positioned(
-              top: 100, // Below AppBar
-              left: 20,
-              right: 20,
-              child: GestureDetector(
-                onTap: _navigateToSearch,
-                child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+          ),
+
+          // 2. Custom Top Navigation Bar
+          Positioned(
+            top: 50,
+            left: 20,
+            right: 20,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                // Location Picker
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 8,
+                  ),
                   decoration: BoxDecoration(
                     color: Colors.white,
-                    borderRadius: BorderRadius.circular(15),
-                    boxShadow: const [
-                       BoxShadow(
-                        color: Colors.black26,
-                        blurRadius: 15,
-                        offset: Offset(0, 5),
+                    borderRadius: BorderRadius.circular(25),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black12,
+                        blurRadius: 10,
+                        offset: const Offset(0, 4),
                       ),
                     ],
                   ),
                   child: Row(
-                    children: [
-                      Icon(Icons.search, color: Colors.blueAccent, size: 28),
-                      SizedBox(width: 15),
+                    children: const [
                       Text(
-                        "Where to go?",
+                        "San Francisco",
                         style: TextStyle(
                           color: Colors.black87,
-                          fontSize: 18,
-                          fontWeight: FontWeight.w600,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 14,
                         ),
                       ),
-                      Spacer(),
-                      Container(
-                        padding: EdgeInsets.all(5),
-                         decoration: BoxDecoration(
-                          color: Colors.grey,
-                          shape: BoxShape.circle,
-                        ),
-                         child: Icon(Icons.arrow_forward, color: Colors.white, size: 16)
-                      )
+                      SizedBox(width: 4),
+                      Icon(
+                        Icons.keyboard_arrow_down,
+                        size: 18,
+                        color: Colors.black54,
+                      ),
                     ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+
+          // 3. Floating Search Bar
+          if (!_showFarePanel)
+            Positioned(
+              bottom: 180, // Increased gap from bottom nav
+              left: 20,
+              right: 20,
+              child: GestureDetector(
+                onTap: _navigateToSearch,
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(20),
+                  child: BackdropFilter(
+                    filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+                    child: Container(
+                      height: 65,
+                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withValues(alpha: 0.7),
+                        borderRadius: BorderRadius.circular(20),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withValues(alpha: 0.1),
+                            blurRadius: 20,
+                            offset: const Offset(0, 5),
+                          ),
+                        ],
+                      ),
+                      child: Row(
+                        children: const [
+                          Icon(Icons.search, color: Colors.black54, size: 24),
+                          SizedBox(width: 15),
+                          Text(
+                            "Where to go?",
+                            style: TextStyle(
+                              color: Colors.black54,
+                              fontSize: 18,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
                   ),
                 ),
               ),
             ),
+
+          // 4. Ride Selection Sheet (when active)
           if (_showFarePanel)
             Positioned(
               bottom: 0,
               left: 0,
               right: 0,
               child: RideSelectionSheet(
-                distanceDuration: const {"distance": 5, "duration": 15}, // mock
+                distanceDuration: const {"distance": 5, "duration": 15},
                 onRideSelected: _onRideSelected,
+              ),
+            ),
+
+          // 5. My Location Button
+          if (!_showFarePanel)
+            Positioned(
+              bottom: 260, // Above Search Bar
+              right: 20,
+              child: FloatingActionButton(
+                mini: true,
+                onPressed: _getCurrentLocation,
+                backgroundColor: Colors.white,
+                foregroundColor: Colors.black,
+                elevation: 4,
+                child: _isLocating
+                    ? const SizedBox(
+                        width: 24,
+                        height: 24,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          color: Colors.black,
+                        ),
+                      )
+                    : const Icon(Icons.my_location, size: 20),
               ),
             ),
         ],

@@ -24,7 +24,8 @@ class _RideSelectionSheetState extends State<RideSelectionSheet> {
       "desc": "Affordable, everyday rides",
       "basePrice": 5.0,
       "multiplier": 0.8,
-      "image": "https://raw.githubusercontent.com/googlemaps-samples/codelab-maps-platform-101-flutter/master/assets/images/uber_go.png", // placeholder
+      "image": Icons.directions_car_filled, // Using IconData for robustness
+      "color": Colors.blue,
     },
     {
       "id": "go",
@@ -32,7 +33,8 @@ class _RideSelectionSheetState extends State<RideSelectionSheet> {
       "desc": "Dependable rides",
       "basePrice": 8.0,
       "multiplier": 1.2,
-      "image": "https://raw.githubusercontent.com/googlemaps-samples/codelab-maps-platform-101-flutter/master/assets/images/uber_x.png", // placeholder
+      "image": Icons.local_taxi,
+      "color": Colors.black,
     },
     {
       "id": "business",
@@ -40,107 +42,155 @@ class _RideSelectionSheetState extends State<RideSelectionSheet> {
       "desc": "Premium rides in high-end cars",
       "basePrice": 15.0,
       "multiplier": 2.0,
-      "image": "https://raw.githubusercontent.com/googlemaps-samples/codelab-maps-platform-101-flutter/master/assets/images/uber_black.png", // placeholder
-    }
+      "image": Icons.airport_shuttle,
+      "color": Colors.grey[800],
+    },
   ];
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
       decoration: const BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        borderRadius: BorderRadius.vertical(top: Radius.circular(25)),
         boxShadow: [
           BoxShadow(
-            color: Colors.black26,
-            blurRadius: 20,
-            offset: Offset(0, -5),
+            color: Colors.black12,
+            blurRadius: 30,
+            offset: Offset(0, -10),
           ),
         ],
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
+          // Drag Handle
           Container(
-            width: 50,
-            height: 5,
+            width: 40,
+            height: 4,
             decoration: BoxDecoration(
               color: Colors.grey[300],
-              borderRadius: BorderRadius.circular(10),
+              borderRadius: BorderRadius.circular(2),
             ),
+          ),
+          const SizedBox(height: 25),
+
+          // Header
+          Row(
+            children: const [
+              Text(
+                "Choose a ride",
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.w800,
+                  color: Colors.black87,
+                ),
+              ),
+            ],
           ),
           const SizedBox(height: 20),
-          const Align(
-            alignment: Alignment.centerLeft,
-            child: Text(
-              "Choose a ride",
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
-          ),
-          const SizedBox(height: 10),
+
+          // Ride Options List
           ...List.generate(_rideOptions.length, (index) {
-             final option = _rideOptions[index];
-             // Simple price calc: Base + (Dist * Multiplier) (Mock distance 5km for now if not passed)
-             double price = option["basePrice"]; // simplistic
-             
-             return GestureDetector(
-               onTap: () {
-                 setState(() => _selectedIndex = index);
-               },
-               child: Container(
-                 margin: const EdgeInsets.only(bottom: 10),
-                 padding: const EdgeInsets.all(12),
-                 decoration: BoxDecoration(
-                   color: _selectedIndex == index ? Colors.black.withOpacity(0.05) : Colors.white,
-                   border: Border.all(
-                     color: _selectedIndex == index ? Colors.black : Colors.transparent,
-                     width: 2,
-                   ),
-                   borderRadius: BorderRadius.circular(12),
-                 ),
-                 child: Row(
-                   children: [
-                     Image.network(
-                       option["image"],
-                       width: 60,
-                       errorBuilder: (_,__,___) => const Icon(Icons.directions_car, size: 40),
-                     ),
-                     const SizedBox(width: 15),
-                     Expanded(
-                       child: Column(
-                         crossAxisAlignment: CrossAxisAlignment.start,
-                         children: [
-                           Text(
-                             option["name"],
-                             style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-                           ),
-                           Text(
-                             option["desc"],
-                             style: TextStyle(color: Colors.grey[600], fontSize: 12),
-                           ),
-                         ],
-                       ),
-                     ),
-                     Column(
-                       crossAxisAlignment: CrossAxisAlignment.end,
-                       children: [
-                         Text(
-                           "\$${price.toStringAsFixed(2)}",
-                           style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-                         ),
-                         const Text(
-                           "3 min",
-                           style: TextStyle(color: Colors.grey, fontSize: 12),
-                         ),
-                       ],
-                     ),
-                   ],
-                 ),
-               ),
-             );
+            final option = _rideOptions[index];
+            double price = option["basePrice"];
+            bool isSelected = _selectedIndex == index;
+
+            return GestureDetector(
+              onTap: () {
+                setState(() => _selectedIndex = index);
+              },
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 200),
+                margin: const EdgeInsets.only(bottom: 15),
+                padding: const EdgeInsets.symmetric(
+                  vertical: 15,
+                  horizontal: 15,
+                ),
+                decoration: BoxDecoration(
+                  color: isSelected ? Colors.grey[50] : Colors.white,
+                  border: Border.all(
+                    color: isSelected ? Colors.black : Colors.grey[200]!,
+                    width: isSelected ? 2 : 1,
+                  ),
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: Row(
+                  children: [
+                    // Vehicle Icon
+                    Container(
+                      padding: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        color: (option["color"] as Color).withValues(
+                          alpha: 0.1,
+                        ),
+                        shape: BoxShape.circle,
+                      ),
+                      child: Icon(
+                        option["image"] as IconData,
+                        size: 28,
+                        color: option["color"],
+                      ),
+                    ),
+                    const SizedBox(width: 15),
+
+                    // Details
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            option["name"],
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16,
+                              color: isSelected ? Colors.black : Colors.black87,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            option["desc"],
+                            style: TextStyle(
+                              color: Colors.grey[600],
+                              fontSize: 12,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+
+                    // Price
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        Text(
+                          "\$${price.toStringAsFixed(2)}",
+                          style: const TextStyle(
+                            fontWeight: FontWeight.w800,
+                            fontSize: 16,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          "3 min",
+                          style: TextStyle(
+                            color: Colors.grey[500],
+                            fontSize: 12,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            );
           }),
+
           const SizedBox(height: 20),
+
+          // Book Button
           SizedBox(
             width: double.infinity,
             child: ElevatedButton(
@@ -150,12 +200,19 @@ class _RideSelectionSheetState extends State<RideSelectionSheet> {
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.black,
-                padding: const EdgeInsets.symmetric(vertical: 16),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                foregroundColor: Colors.white,
+                elevation: 0,
+                padding: const EdgeInsets.symmetric(vertical: 18),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(15),
+                ),
               ),
               child: Text(
                 "Confirm ${_rideOptions[_selectedIndex]["name"]}",
-                style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
+                style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             ),
           ),

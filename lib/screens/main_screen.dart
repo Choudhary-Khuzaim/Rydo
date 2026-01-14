@@ -3,6 +3,8 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:rydo/screens/home_screen.dart';
 import 'package:rydo/screens/trips_screen.dart';
+import 'package:rydo/screens/wallet_screen.dart';
+import 'package:rydo/screens/account_screen.dart';
 
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
@@ -17,8 +19,8 @@ class _MainScreenState extends State<MainScreen> {
   final List<Widget> _screens = [
     const HomeScreen(),
     const TripsScreen(),
-    const Scaffold(body: Center(child: Text("Wallet (Coming Soon)"))),
-    const Scaffold(body: Center(child: Text("Account (Coming Soon)"))),
+    const WalletScreen(),
+    const AccountScreen(),
   ];
 
   void _onItemTapped(int index) {

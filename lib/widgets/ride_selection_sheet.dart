@@ -22,7 +22,7 @@ class _RideSelectionSheetState extends State<RideSelectionSheet> {
       "id": "mini",
       "name": "Rydo Mini",
       "desc": "Affordable, everyday rides",
-      "basePrice": 5.0,
+      "basePrice": 350.0,
       "multiplier": 0.8,
       "image": Icons.directions_car_filled, // Using IconData for robustness
       "color": Colors.blue,
@@ -31,7 +31,7 @@ class _RideSelectionSheetState extends State<RideSelectionSheet> {
       "id": "go",
       "name": "Rydo Go",
       "desc": "Dependable rides",
-      "basePrice": 8.0,
+      "basePrice": 550.0,
       "multiplier": 1.2,
       "image": Icons.local_taxi,
       "color": Colors.black,
@@ -40,7 +40,7 @@ class _RideSelectionSheetState extends State<RideSelectionSheet> {
       "id": "business",
       "name": "Business",
       "desc": "Premium rides in high-end cars",
-      "basePrice": 15.0,
+      "basePrice": 1200.0,
       "multiplier": 2.0,
       "image": Icons.airport_shuttle,
       "color": Colors.grey[800],
@@ -166,7 +166,7 @@ class _RideSelectionSheetState extends State<RideSelectionSheet> {
                       crossAxisAlignment: CrossAxisAlignment.end,
                       children: [
                         Text(
-                          "\$${price.toStringAsFixed(2)}",
+                          "Rs. ${price.toStringAsFixed(0)}",
                           style: const TextStyle(
                             fontWeight: FontWeight.w800,
                             fontSize: 16,

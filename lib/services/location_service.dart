@@ -1,4 +1,5 @@
 import 'package:geolocator/geolocator.dart';
+import 'package:geocoding/geocoding.dart';
 
 class LocationService {
   Future<Position> determinePosition() async {
@@ -34,5 +35,26 @@ class LocationService {
       distanceFilter: 10, // Update every 10 meters
     );
     return Geolocator.getPositionStream(locationSettings: locationSettings);
+  }
+
+  Future<String> getAddressFromLatLng(double latitude, double longitude) async {
+    try {
+      List<Placemark> placemarks = await placemarkFromCoordinates(
+        latitude,
+        longitude,
+      );
+      if (placemarks.isNotEmpty) {
+        Placemark place = placemarks[0];
+        // Combine parts of the address for a human-readable name
+        // Prefer locality (city) or subLocality
+        return place.locality ??
+            place.subLocality ??
+            place.name ??
+            "Unknown Location";
+      }
+    } catch (e) {
+      return "Fetching location...";
+    }
+    return "Unknown Location";
   }
 }

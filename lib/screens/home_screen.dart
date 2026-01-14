@@ -23,6 +23,7 @@ class _HomeScreenState extends State<HomeScreen> {
   final MapController _mapController = MapController();
   final LocationService _locationService = LocationService();
   LatLng? _currentPosition;
+  String _currentAddress = "San Francisco";
   List<Marker> _markers = [];
   List<Polyline> _polylines = [];
   bool _showFarePanel = false;
@@ -77,29 +78,53 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
-  void _updateUserMarker(Position position) {
-    setState(() {
-      _currentPosition = LatLng(position.latitude, position.longitude);
+  void _updateUserMarker(Position position) async {
+    final latLng = LatLng(position.latitude, position.longitude);
 
-      // Update or add the user location marker
-      // We keep the first marker as the user's location
-      final userMarker = Marker(
-        point: _currentPosition!,
-        width: 80,
-        height: 80,
-        child: const Icon(
-          Icons.location_history, // Changed to a more "live" indicator
-          color: Colors.blue,
-          size: 40,
-        ),
+    // Only update address if we don't have one or if the position changed significantly
+    // (Optimization: distance filter already handles some of this)
+    if (_currentPosition == null ||
+        Geolocator.distanceBetween(
+              _currentPosition!.latitude,
+              _currentPosition!.longitude,
+              position.latitude,
+              position.longitude,
+            ) >
+            100) {
+      String address = await _locationService.getAddressFromLatLng(
+        position.latitude,
+        position.longitude,
       );
-
-      if (_markers.isEmpty) {
-        _markers.add(userMarker);
-      } else {
-        _markers[0] = userMarker;
+      if (mounted) {
+        setState(() {
+          _currentAddress = address;
+        });
       }
-    });
+    }
+
+    if (mounted) {
+      setState(() {
+        _currentPosition = latLng;
+
+        // Update or add the user location marker
+        final userMarker = Marker(
+          point: _currentPosition!,
+          width: 80,
+          height: 80,
+          child: const Icon(
+            Icons.location_history,
+            color: Colors.blue,
+            size: 40,
+          ),
+        );
+
+        if (_markers.isEmpty) {
+          _markers.add(userMarker);
+        } else {
+          _markers[0] = userMarker;
+        }
+      });
+    }
   }
 
   Future<void> _getCurrentLocation() async {
@@ -298,17 +323,18 @@ class _HomeScreenState extends State<HomeScreen> {
                     ],
                   ),
                   child: Row(
-                    children: const [
+                    children: [
                       Text(
-                        "San Francisco",
-                        style: TextStyle(
+                        _currentAddress,
+                        style: const TextStyle(
                           color: Colors.black87,
                           fontWeight: FontWeight.bold,
                           fontSize: 14,
                         ),
+                        overflow: TextOverflow.ellipsis,
                       ),
-                      SizedBox(width: 4),
-                      Icon(
+                      const SizedBox(width: 4),
+                      const Icon(
                         Icons.keyboard_arrow_down,
                         size: 18,
                         color: Colors.black54,

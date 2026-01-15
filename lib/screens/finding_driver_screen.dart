@@ -7,7 +7,8 @@ class FindingDriverScreen extends StatefulWidget {
   State<FindingDriverScreen> createState() => _FindingDriverScreenState();
 }
 
-class _FindingDriverScreenState extends State<FindingDriverScreen> with TickerProviderStateMixin {
+class _FindingDriverScreenState extends State<FindingDriverScreen>
+    with TickerProviderStateMixin {
   late AnimationController _controller;
 
   @override
@@ -28,27 +29,35 @@ class _FindingDriverScreenState extends State<FindingDriverScreen> with TickerPr
 
   @override
   Widget build(BuildContext context) {
+    final bool isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: Center(
         child: Column(
+          mainAxisSize: MainAxisSize.min,
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Stack(
               alignment: Alignment.center,
               children: [
-                _buildRing(200),
-                _buildRing(280),
-                _buildRing(360),
-                const Icon(Icons.directions_car, size: 50, color: Colors.black),
+                _buildRing(200, context),
+                _buildRing(280, context),
+                _buildRing(360, context),
+                Icon(
+                  Icons.directions_car,
+                  size: 50,
+                  color: isDark ? Colors.blueAccent : Colors.black,
+                ),
               ],
             ),
             const SizedBox(height: 50),
-            const Text(
+            Text(
               "Finding your ride...",
               style: TextStyle(
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
+                color: Theme.of(context).textTheme.bodyLarge?.color,
               ),
             ),
             const SizedBox(height: 10),
@@ -56,30 +65,41 @@ class _FindingDriverScreenState extends State<FindingDriverScreen> with TickerPr
               "Connecting you with nearby drivers",
               style: TextStyle(
                 fontSize: 16,
-                color: Colors.grey[600],
+                color: isDark ? Colors.grey[400] : Colors.grey[600],
               ),
             ),
             const SizedBox(height: 30),
-            LinearProgressIndicator(
-              backgroundColor: Colors.grey[200],
-              valueColor: const AlwaysStoppedAnimation<Color>(Colors.black),
-              minHeight: 2,
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 50),
+              child: LinearProgressIndicator(
+                backgroundColor: isDark ? Colors.grey[900] : Colors.grey[200],
+                valueColor: AlwaysStoppedAnimation<Color>(
+                  isDark ? Colors.blueAccent : Colors.black,
+                ),
+                minHeight: 2,
+              ),
             ),
-            const SizedBox(height: 30),
-             TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: const Text("Cancel Request", style: TextStyle(color: Colors.red)),
-            )
-
+            const SizedBox(height: 50),
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text(
+                "Cancel Request",
+                style: TextStyle(
+                  color: Colors.red,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildRing(double size) {
+  Widget _buildRing(double size, BuildContext context) {
+    final bool isDark = Theme.of(context).brightness == Brightness.dark;
+    final Color ringColor = isDark ? Colors.blueAccent : Colors.black;
+
     return AnimatedBuilder(
       animation: _controller,
       builder: (context, child) {
@@ -89,7 +109,7 @@ class _FindingDriverScreenState extends State<FindingDriverScreen> with TickerPr
           decoration: BoxDecoration(
             shape: BoxShape.circle,
             border: Border.all(
-              color: Colors.black.withOpacity(1 - _controller.value),
+              color: ringColor.withValues(alpha: 1 - _controller.value),
               width: 2,
             ),
           ),

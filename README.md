@@ -33,38 +33,42 @@ I've built this as a reference point for developers who want to see how to imple
 
 ---
 
-## 🆕 Major Updates (v1.1)
+## 🆕 Major Updates (v1.2)
 
-I've been pushing quite a few changes lately to make the app feel like a complete product:
+The app has recently undergone a major transformation to reach production-grade quality:
 
-*   **Financial Ecosystem (PKR)**: The entire app has been localized for Pakistan. Every price, wallet balance, and transaction history now uses **PKR (Rs.)** with realistic local scaling.
-*   **Persistent Shell Navigation**: Refactored the architecture to use a custom `MainScreen` shell. This means your bottom nav bar stays put while you switch between map, wallet, and history—providing a seamless iOS-like experience.
-*   **The Wallet Suite**: More than just a static screen. We now have:
-    *   **Top Up**: Integrated amount selection and mockup payment method handling.
-    *   **Send Money**: A full transfer flow with person-to-person search and quick contacts.
-    *   **Activity Log**: A detailed, categorized history of every ride and refill.
-*   **Smart Address Detection**: The map now does more than just show a blue dot. It automatically resolves your GPS coordinates into human-readable area names (like "Gulberg, Lahore" or "Clifton, Karachi") in real-time.
-*   **Account Hub**: A dedicated space for personal info, preferences, and security settings, all built with custom Sliver effects for that "premium" feel.
+*   **Dynamic Theme Switching (Dark Mode)**: A full system-wide theme engine is now integrated. Users can switch between Light and Dark modes.
+*   **Dual Map Engine**: The map now dynamically adjusts its tiles based on the theme: 
+    *   **Light Mode**: Uses *CartoDB Voyager* for a clean, colorful look.
+    *   **Dark Mode**: Uses *CartoDB Dark Matter*, providing a high-contrast, eye-friendly night experience.
+*   **Real Road-Based Routing**: Replaced traditional "straight-line" navigation with real road data using the **OSRM (Open Source Routing Machine) API**. Your ride paths now follow actual streets.
+*   **Premium Screen Overhaul**: Added and professionalized over 10+ new specialized screens including:
+    *   **Appearance**: System-wide theme control.
+    *   **Help Center**: Automated FAQ and support categories.
+    *   **Chat Interface**: Real-time mock chat with drivers including quick-replies.
+    *   **Favorites & Privacy**: Dedicated management for saved places and data policies.
+*   **Safety & Prevention**: Implemented booking debouncing and state management to prevent double-bookings and navigation glitches.
 
 ---
 
 ## 🌟 Core Features
 
-*   **�️ Maps & Geolocation**: Built on `flutter_map` (OpenStreetMap). It’s lightweight, fast, and completely free to use.
+*   **🗺️ Maps & Geolocation**: Built on `flutter_map` (OpenStreetMap). It’s lightweight, fast, and completely free to use.
+*   **🌓 Adaptive Theming**: Seamless transition between light and dark modes across all widgets and map tiles.
+*   **🚗 Real-Path Routing**: Accurate ETA and road-following paths using OSRM engine.
 *   **🎨 Glassmorphic UI**: High-end translucent effects on the floating search bar and bottom navigation.
-*   **💰 Wallet Integration**: Full end-to-end flow for managing balances and tracking spending.
+*   **💰 Wallet Integration**: Full end-to-end flow localized in **PKR (Rs.)** for managing balances and tracking spending.
 *   **⚡ Optimized Performance**: State is managed efficiently to ensure 60FPS map interactions even on mid-range devices.
-*   **� Modern Components**: Custom ride selection sheets, animated splash screens, and professional form handling.
 
 ---
 
 ## 🛠 Tech Stack
 
 *   **Framework**: [Flutter](https://flutter.dev/) (Dart)
-*   **Tile Server**: [OpenStreetMap](https://www.openstreetmap.org/)
+*   **Tile Servers**: [CartoDB](https://carto.com/basemaps/) (Voyager & Dark Matter)
+*   **Routing Engine**: [OSRM](http://project-osrm.org/) (Open Source Routing Machine)
 *   **Location Services**: [geolocator](https://pub.dev/packages/geolocator) & [geocoding](https://pub.dev/packages/geocoding)
-*   **Icons**: [Cupertino Icons](https://pub.dev/packages/cupertino_icons) & FontAwesome
-*   **Proposed State Management**: [Riverpod](https://riverpod.dev/) (Currently scaling from `setState`)
+*   **Icons**: [Cupertino Icons](https://pub.dev/packages/cupertino_icons) & Lucide-like custom icons
 
 ---
 
@@ -86,7 +90,7 @@ To get this up and running on your local machine:
     flutter run
     ```
 
-**Dev Note:** For Android builds, double-check that `INTERNET` and `ACCESS_FINE_LOCATION` permissions are enabled in your `AndroidManifest.xml` to allow map tiles to load correctly.
+**Dev Note:** For Android builds, double-check that `INTERNET` and `ACCESS_FINE_LOCATION` permissions are enabled in your `AndroidManifest.xml` to allow map tiles and routing to work correctly.
 
 ---
 
@@ -96,7 +100,7 @@ To get this up and running on your local machine:
 - [ ] Real-time Driver Tracking via WebSockets
 - [ ] Wallet Payment Gateway (Stripe/JazzCash integration)
 - [ ] Driver-side dedicated dashboard
-- [ ] Dark Mode Support (Full dynamic theme switching)
+- [ ] Multi-language support (Urdu localization)
 
 ---
 

@@ -9,153 +9,259 @@ class WalletScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey[50],
-      appBar: AppBar(
+      backgroundColor: const Color(0xFFF8F9FA),
+      body: CustomScrollView(
+        slivers: [
+          _buildSliverAppBar(context),
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _buildBalanceCard(),
+                  const SizedBox(height: 40),
+                  _buildSectionHeader("QUICK ACTIONS"),
+                  const SizedBox(height: 20),
+                  _buildQuickActions(context),
+                  const SizedBox(height: 48),
+                  _buildSectionHeader("RECENT TRANSACTIONS"),
+                  const SizedBox(height: 24),
+                  _buildTransactionList(),
+                  const SizedBox(height: 40),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSliverAppBar(BuildContext context) {
+    return SliverAppBar(
+      expandedHeight: 120,
+      pinned: true,
+      elevation: 0,
+      backgroundColor: Colors.black,
+      leading: IconButton(
+        icon: const Icon(
+          Icons.arrow_back_ios_new,
+          color: Colors.white,
+          size: 20,
+        ),
+        onPressed: () => Navigator.pop(context),
+      ),
+      flexibleSpace: FlexibleSpaceBar(
+        centerTitle: false,
+        titlePadding: const EdgeInsets.only(left: 60, bottom: 20),
         title: const Text(
           "My Wallet",
           style: TextStyle(
-            color: Colors.black,
+            color: Colors.white,
             fontWeight: FontWeight.bold,
-            fontSize: 20,
+            fontSize: 22,
           ),
         ),
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        centerTitle: true,
-      ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.symmetric(horizontal: 20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const SizedBox(height: 10),
-            // Balance Card
-            _buildBalanceCard(),
-            const SizedBox(height: 30),
-
-            // Quick Actions
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                _buildQuickAction(Icons.add_rounded, "Top Up", () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const TopUpScreen(),
-                    ),
-                  );
-                }),
-                _buildQuickAction(Icons.send_rounded, "Send", () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const SendMoneyScreen(),
-                    ),
-                  );
-                }),
-                _buildQuickAction(Icons.history_rounded, "Activity", () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const ActivityScreen(),
-                    ),
-                  );
-                }),
-              ],
+        background: Container(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              colors: [Colors.black, Color(0xFF2D2D2D)],
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
             ),
-            const SizedBox(height: 40),
-
-            // Transactions Header
-            const Text(
-              "Recent Transactions",
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: Colors.black87,
+          ),
+          child: Stack(
+            children: [
+              Positioned(
+                right: -30,
+                bottom: -30,
+                child: Icon(
+                  Icons.account_balance_wallet_rounded,
+                  size: 160,
+                  color: Colors.white.withOpacity(0.05),
+                ),
               ),
-            ),
-            const SizedBox(height: 20),
-
-            // Transactions List
-            _buildTransactionItem(
-              "Ride to Airport",
-              "14 Jan, 08:30 PM",
-              "Rs. 4,500",
-              false,
-            ),
-            _buildTransactionItem(
-              "Wallet Topup",
-              "12 Jan, 11:15 AM",
-              "Rs. 10,000",
-              true,
-            ),
-            _buildTransactionItem(
-              "Night Ride Home",
-              "10 Jan, 11:45 PM",
-              "Rs. 1,250",
-              false,
-            ),
-            _buildTransactionItem(
-              "Refund - Cancelled Trip",
-              "08 Jan, 02:20 PM",
-              "Rs. 500",
-              true,
-            ),
-
-            const SizedBox(height: 100), // Space for floating nav
-          ],
+            ],
+          ),
         ),
       ),
     );
   }
 
   Widget _buildBalanceCard() {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(24),
-      decoration: BoxDecoration(
-        color: Colors.black,
-        borderRadius: BorderRadius.circular(30),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.2),
-            blurRadius: 20,
-            offset: const Offset(0, 10),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              const Text(
-                "Total Balance",
-                style: TextStyle(color: Colors.white70, fontSize: 16),
-              ),
-              Image.network(
-                "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2a/Mastercard-logo.svg/1280px-Mastercard-logo.svg.png",
-                height: 30,
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(32),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(32),
+            gradient: const LinearGradient(
+              colors: [Color(0xFF111111), Color(0xFF2D2D2D)],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.15),
+                blurRadius: 30,
+                offset: const Offset(0, 15),
               ),
             ],
           ),
-          const SizedBox(height: 10),
-          const Text(
-            "Rs. 12,250",
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 36,
-              fontWeight: FontWeight.bold,
-            ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        "Current Balance",
+                        style: TextStyle(
+                          color: Colors.white54,
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      SizedBox(height: 8),
+                      Text(
+                        "Rs. 12,250.00",
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 32,
+                          fontWeight: FontWeight.w900,
+                          letterSpacing: -0.5,
+                        ),
+                      ),
+                    ],
+                  ),
+                  Container(
+                    height: 50,
+                    width: 50,
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.1),
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Icon(
+                      Icons.qr_code_scanner_rounded,
+                      color: Colors.white,
+                      size: 24,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 48),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text(
+                    "**** **** **** 4582",
+                    style: TextStyle(
+                      color: Colors.white38,
+                      fontSize: 14,
+                      letterSpacing: 2,
+                    ),
+                  ),
+                  Image.network(
+                    "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2a/Mastercard-logo.svg/1280px-Mastercard-logo.svg.png",
+                    height: 25,
+                    color: Colors.white.withOpacity(0.8),
+                    colorBlendMode: BlendMode.modulate,
+                  ),
+                ],
+              ),
+            ],
           ),
-          const SizedBox(height: 30),
-          const Text(
-            "**** **** **** 4582",
-            style: TextStyle(
-              color: Colors.white54,
-              fontSize: 16,
-              letterSpacing: 2,
+        ),
+      ],
+    );
+  }
+
+  Widget _buildSectionHeader(String title) {
+    return Text(
+      title,
+      style: TextStyle(
+        fontSize: 12,
+        fontWeight: FontWeight.w800,
+        color: Colors.grey[500],
+        letterSpacing: 1.5,
+      ),
+    );
+  }
+
+  Widget _buildQuickActions(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        _buildActionItem(
+          Icons.add_rounded,
+          "Top Up",
+          Colors.blue,
+          () => Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const TopUpScreen()),
+          ),
+        ),
+        _buildActionItem(
+          Icons.send_rounded,
+          "Send",
+          Colors.orange,
+          () => Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const SendMoneyScreen()),
+          ),
+        ),
+        _buildActionItem(
+          Icons.history_rounded,
+          "Activity",
+          Colors.teal,
+          () => Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const ActivityScreen()),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildActionItem(
+    IconData icon,
+    String label,
+    Color color,
+    VoidCallback onTap,
+  ) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Column(
+        children: [
+          Container(
+            height: 75,
+            width: 75,
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(24),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.03),
+                  blurRadius: 15,
+                  offset: const Offset(0, 8),
+                ),
+              ],
+            ),
+            child: Icon(icon, color: Colors.black, size: 30),
+          ),
+          const SizedBox(height: 12),
+          Text(
+            label,
+            style: const TextStyle(
+              fontSize: 13,
+              fontWeight: FontWeight.bold,
+              color: Colors.black87,
             ),
           ),
         ],
@@ -163,36 +269,36 @@ class WalletScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildQuickAction(IconData icon, String label, VoidCallback onTap) {
+  Widget _buildTransactionList() {
     return Column(
       children: [
-        GestureDetector(
-          onTap: onTap,
-          child: Container(
-            height: 60,
-            width: 60,
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(20),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.05),
-                  blurRadius: 10,
-                  offset: const Offset(0, 5),
-                ),
-              ],
-            ),
-            child: Icon(icon, color: Colors.black, size: 28),
-          ),
+        _buildTransactionItem(
+          "Ride to Airport",
+          "14 Jan 2026, 08:30 PM",
+          "- Rs. 4,500",
+          false,
+          Icons.directions_car_filled_rounded,
         ),
-        const SizedBox(height: 10),
-        Text(
-          label,
-          style: const TextStyle(
-            fontSize: 14,
-            fontWeight: FontWeight.w600,
-            color: Colors.black54,
-          ),
+        _buildTransactionItem(
+          "Wallet Topup",
+          "12 Jan 2026, 11:15 AM",
+          "+ Rs. 10,000",
+          true,
+          Icons.account_balance_wallet_rounded,
+        ),
+        _buildTransactionItem(
+          "Night Ride Home",
+          "10 Jan 2026, 11:45 PM",
+          "- Rs. 1,250",
+          false,
+          Icons.directions_car_filled_rounded,
+        ),
+        _buildTransactionItem(
+          "Refund - Cancelled Trip",
+          "08 Jan 2026, 02:20 PM",
+          "+ Rs. 500",
+          true,
+          Icons.refresh_rounded,
         ),
       ],
     );
@@ -203,31 +309,33 @@ class WalletScreen extends StatelessWidget {
     String date,
     String amount,
     bool isPositive,
+    IconData icon,
   ) {
     return Container(
-      margin: const EdgeInsets.only(bottom: 15),
-      padding: const EdgeInsets.all(16),
+      margin: const EdgeInsets.only(bottom: 16),
+      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(24),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.01),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
       ),
       child: Row(
         children: [
           Container(
-            height: 50,
-            width: 50,
+            padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: isPositive
-                  ? Colors.green.withValues(alpha: 0.1)
-                  : Colors.red.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(15),
+              color: Colors.grey[50],
+              borderRadius: BorderRadius.circular(16),
             ),
-            child: Icon(
-              isPositive ? Icons.north_east_rounded : Icons.south_west_rounded,
-              color: isPositive ? Colors.green[700] : Colors.red[700],
-            ),
+            child: Icon(icon, color: Colors.black, size: 24),
           ),
-          const SizedBox(width: 15),
+          const SizedBox(width: 16),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -241,7 +349,11 @@ class WalletScreen extends StatelessWidget {
                 ),
                 Text(
                   date,
-                  style: const TextStyle(color: Colors.black38, fontSize: 13),
+                  style: TextStyle(
+                    color: Colors.grey[400],
+                    fontSize: 12,
+                    fontWeight: FontWeight.w500,
+                  ),
                 ),
               ],
             ),
@@ -249,9 +361,9 @@ class WalletScreen extends StatelessWidget {
           Text(
             amount,
             style: TextStyle(
-              fontWeight: FontWeight.bold,
-              fontSize: 16,
-              color: isPositive ? Colors.green[700] : Colors.red[700],
+              fontWeight: FontWeight.w900,
+              fontSize: 15,
+              color: isPositive ? Colors.green[600] : Colors.red[400],
             ),
           ),
         ],

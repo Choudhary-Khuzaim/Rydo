@@ -31,7 +31,10 @@ class _MainScreenState extends State<MainScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final bool isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Scaffold(
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: Stack(
         children: [
           IndexedStack(index: _selectedIndex, children: _screens),
@@ -45,11 +48,13 @@ class _MainScreenState extends State<MainScreen> {
                 filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
                 child: Container(
                   decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.8),
+                    color: isDark
+                        ? Colors.black.withValues(alpha: 0.8)
+                        : Colors.white.withValues(alpha: 0.8),
                     borderRadius: BorderRadius.circular(30),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.1),
+                        color: Colors.black.withValues(alpha: 0.2),
                         blurRadius: 20,
                         offset: const Offset(0, 5),
                       ),
@@ -92,6 +97,10 @@ class _MainScreenState extends State<MainScreen> {
 
   Widget _buildNavItem(IconData icon, String label, int index) {
     final bool isActive = _selectedIndex == index;
+    final bool isDark = Theme.of(context).brightness == Brightness.dark;
+    final Color activeColor = isDark ? Colors.blueAccent : Colors.black;
+    final Color inactiveColor = isDark ? Colors.white38 : Colors.black38;
+
     return GestureDetector(
       onTap: () => _onItemTapped(index),
       behavior: HitTestBehavior.opaque,
@@ -100,16 +109,12 @@ class _MainScreenState extends State<MainScreen> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(
-              icon,
-              color: isActive ? Colors.black : Colors.black38,
-              size: 26,
-            ),
+            Icon(icon, color: isActive ? activeColor : inactiveColor, size: 26),
             const SizedBox(height: 4),
             Text(
               label,
               style: TextStyle(
-                color: isActive ? Colors.black : Colors.black38,
+                color: isActive ? activeColor : inactiveColor,
                 fontSize: 10,
                 fontWeight: isActive ? FontWeight.bold : FontWeight.normal,
               ),

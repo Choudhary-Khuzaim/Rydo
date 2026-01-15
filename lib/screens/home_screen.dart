@@ -11,6 +11,7 @@ import 'package:rydo/widgets/ride_selection_sheet.dart';
 import 'package:rydo/screens/finding_driver_screen.dart';
 import 'package:rydo/screens/driver_details_screen.dart';
 import 'package:rydo/apis/osm_api.dart';
+import 'package:rydo/services/route_service.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -142,40 +143,80 @@ class _HomeScreenState extends State<HomeScreen> {
       MaterialPageRoute(builder: (context) => const SearchScreen()),
     );
 
-    if (result != null && _currentPosition != null) {
-      // Mocking coordinates for the selected result
-      LatLng destination = LatLng(
-        _currentPosition!.latitude + 0.01,
-        _currentPosition!.longitude + 0.01,
-      );
+    if (result != null && result is Map) {
+      final pickup = result['pickup'];
+      final dropoff = result['dropoff'];
 
-      setState(() {
-        // _destinationName = result; // Removed
-        _showFarePanel = true;
-        _markers.add(
-          Marker(
-            point: destination,
-            width: 80,
-            height: 80,
-            child: const Icon(Icons.location_on, color: Colors.red, size: 40),
-          ),
-        );
-        _polylines.add(
-          Polyline(
-            points: [_currentPosition!, destination],
-            color: Colors.black,
-            strokeWidth: 5,
-          ),
-        );
-      });
+      if (dropoff != null) {
+        final double destLat = dropoff['lat'] != 0.0
+            ? dropoff['lat']
+            : (_currentPosition?.latitude ?? _kDefaultLocation.latitude) + 0.01;
+        final double destLon = dropoff['lon'] != 0.0
+            ? dropoff['lon']
+            : (_currentPosition?.longitude ?? _kDefaultLocation.longitude) +
+                  0.01;
 
-      _mapController.move(
-        LatLng(
-          (_currentPosition!.latitude + destination.latitude) / 2,
-          (_currentPosition!.longitude + destination.longitude) / 2,
-        ),
-        13,
-      );
+        LatLng destination = LatLng(destLat, destLon);
+
+        // Handle custom pickup if provided, else use current
+        LatLng pickupPoint = _currentPosition ?? _kDefaultLocation;
+        if (pickup != null && pickup['lat'] != 0.0) {
+          pickupPoint = LatLng(pickup['lat'], pickup['lon']);
+        }
+
+        setState(() {
+          _showFarePanel = true;
+          _markers.clear();
+          _polylines.clear(); // Clear old routes
+        });
+
+        // Add Pickup & Dest Markers immediately
+        setState(() {
+          _markers.add(
+            Marker(
+              point: pickupPoint,
+              width: 80,
+              height: 80,
+              child: const Icon(Icons.circle, color: Colors.blue, size: 20),
+            ),
+          );
+          _markers.add(
+            Marker(
+              point: destination,
+              width: 80,
+              height: 80,
+              child: const Icon(Icons.location_on, color: Colors.red, size: 40),
+            ),
+          );
+        });
+
+        // Fetch real route
+        final List<LatLng> routePoints = await RouteService().getRoute(
+          pickupPoint,
+          destination,
+        );
+
+        if (mounted) {
+          setState(() {
+            _polylines.add(
+              Polyline(
+                points: routePoints,
+                color: Colors.black,
+                strokeWidth: 5,
+              ),
+            );
+          });
+
+          // Zoom to fit the entire route
+          final bounds = LatLngBounds.fromPoints(routePoints);
+          _mapController.fitCamera(
+            CameraFit.bounds(
+              bounds: bounds,
+              padding: const EdgeInsets.all(100),
+            ),
+          );
+        }
+      }
     }
   }
 
@@ -218,20 +259,28 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final bool isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Scaffold(
       extendBodyBehindAppBar: true,
-      backgroundColor: Colors.white,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       drawer: Drawer(
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         child: ListView(
           padding: EdgeInsets.zero,
           children: [
-            const UserAccountsDrawerHeader(
-              decoration: BoxDecoration(color: Colors.black),
-              accountName: Text("John Doe"),
-              accountEmail: Text("john.doe@example.com"),
+            UserAccountsDrawerHeader(
+              decoration: BoxDecoration(
+                color: isDark ? Colors.blueAccent : Colors.black,
+              ),
+              accountName: const Text("John Doe"),
+              accountEmail: const Text("john.doe@example.com"),
               currentAccountPicture: CircleAvatar(
-                backgroundColor: Colors.white,
-                child: Text("JD", style: TextStyle(color: Colors.black)),
+                backgroundColor: isDark ? Colors.black : Colors.white,
+                child: Text(
+                  "JD",
+                  style: TextStyle(color: isDark ? Colors.white : Colors.black),
+                ),
               ),
             ),
             ListTile(
@@ -262,21 +311,16 @@ class _HomeScreenState extends State<HomeScreen> {
                   setState(() {
                     _showFarePanel = false;
                     _polylines.clear();
-                    // Reset markers to just current location if needed,
-                    // but keeping it simple as per request "off ho jye"
                   });
                 }
               },
-              behavior:
-                  HitTestBehavior.opaque, // Ensure it catches taps accurately
+              behavior: HitTestBehavior.opaque,
               child: FlutterMap(
                 mapController: _mapController,
                 options: MapOptions(
                   initialCenter: _currentPosition ?? _kDefaultLocation,
                   initialZoom: 15,
                   onTap: (tapPosition, point) {
-                    // Also handle map tap specifically if the GestureDetector above doesn't catch it
-                    // due to FlutterMap consuming gestures.
                     if (_showFarePanel) {
                       setState(() {
                         _showFarePanel = false;
@@ -287,7 +331,8 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
                 children: [
                   TileLayer(
-                    urlTemplate: OsmApi.tileUrl,
+                    urlTemplate: isDark ? OsmApi.darkTileUrl : OsmApi.tileUrl,
+                    subdomains: const ['a', 'b', 'c', 'd'],
                     userAgentPackageName: OsmApi.userAgent,
                   ),
                   PolylineLayer(polylines: _polylines),
@@ -312,11 +357,11 @@ class _HomeScreenState extends State<HomeScreen> {
                     vertical: 8,
                   ),
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: Theme.of(context).cardColor,
                     borderRadius: BorderRadius.circular(25),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black12,
+                        color: Colors.black.withValues(alpha: 0.1),
                         blurRadius: 10,
                         offset: const Offset(0, 4),
                       ),
@@ -326,18 +371,20 @@ class _HomeScreenState extends State<HomeScreen> {
                     children: [
                       Text(
                         _currentAddress,
-                        style: const TextStyle(
-                          color: Colors.black87,
+                        style: TextStyle(
+                          color: Theme.of(context).textTheme.bodyLarge?.color,
                           fontWeight: FontWeight.bold,
                           fontSize: 14,
                         ),
                         overflow: TextOverflow.ellipsis,
                       ),
                       const SizedBox(width: 4),
-                      const Icon(
+                      Icon(
                         Icons.keyboard_arrow_down,
                         size: 18,
-                        color: Colors.black54,
+                        color: Theme.of(
+                          context,
+                        ).iconTheme.color?.withValues(alpha: 0.6),
                       ),
                     ],
                   ),
@@ -349,7 +396,7 @@ class _HomeScreenState extends State<HomeScreen> {
           // 3. Floating Search Bar
           if (!_showFarePanel)
             Positioned(
-              bottom: 180, // Increased gap from bottom nav
+              bottom: 180,
               left: 20,
               right: 20,
               child: GestureDetector(
@@ -362,7 +409,9 @@ class _HomeScreenState extends State<HomeScreen> {
                       height: 65,
                       padding: const EdgeInsets.symmetric(horizontal: 20),
                       decoration: BoxDecoration(
-                        color: Colors.white.withValues(alpha: 0.7),
+                        color: isDark
+                            ? Colors.black.withValues(alpha: 0.7)
+                            : Colors.white.withValues(alpha: 0.7),
                         borderRadius: BorderRadius.circular(20),
                         boxShadow: [
                           BoxShadow(
@@ -373,13 +422,17 @@ class _HomeScreenState extends State<HomeScreen> {
                         ],
                       ),
                       child: Row(
-                        children: const [
-                          Icon(Icons.search, color: Colors.black54, size: 24),
-                          SizedBox(width: 15),
+                        children: [
+                          Icon(
+                            Icons.search,
+                            color: isDark ? Colors.white70 : Colors.black54,
+                            size: 24,
+                          ),
+                          const SizedBox(width: 15),
                           Text(
                             "Where to go?",
                             style: TextStyle(
-                              color: Colors.black54,
+                              color: isDark ? Colors.white70 : Colors.black54,
                               fontSize: 18,
                               fontWeight: FontWeight.w500,
                             ),
@@ -407,21 +460,21 @@ class _HomeScreenState extends State<HomeScreen> {
           // 5. My Location Button
           if (!_showFarePanel)
             Positioned(
-              bottom: 260, // Above Search Bar
+              bottom: 260,
               right: 20,
               child: FloatingActionButton(
                 mini: true,
                 onPressed: _getCurrentLocation,
-                backgroundColor: Colors.white,
-                foregroundColor: Colors.black,
+                backgroundColor: Theme.of(context).cardColor,
+                foregroundColor: isDark ? Colors.white : Colors.black,
                 elevation: 4,
                 child: _isLocating
-                    ? const SizedBox(
+                    ? SizedBox(
                         width: 24,
                         height: 24,
                         child: CircularProgressIndicator(
                           strokeWidth: 2,
-                          color: Colors.black,
+                          color: isDark ? Colors.white : Colors.black,
                         ),
                       )
                     : const Icon(Icons.my_location, size: 20),

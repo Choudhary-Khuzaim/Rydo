@@ -1,12 +1,23 @@
 import 'package:flutter/material.dart';
+import 'package:rydo/screens/profile_details_screen.dart';
+import 'package:rydo/screens/favorites_screen.dart';
+import 'package:rydo/screens/wallet_screen.dart';
+import 'package:rydo/screens/notifications_screen.dart';
+import 'package:rydo/screens/language_screen.dart';
+import 'package:rydo/screens/appearance_screen.dart';
+import 'package:rydo/screens/help_center_screen.dart';
+import 'package:rydo/screens/privacy_policy_screen.dart';
+import 'package:rydo/screens/about_rydo_screen.dart';
 
 class AccountScreen extends StatelessWidget {
   const AccountScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final bool isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Scaffold(
-      backgroundColor: Colors.grey[50],
+      backgroundColor: isDark ? const Color(0xFF121212) : Colors.grey[50],
       body: CustomScrollView(
         slivers: [
           // Elegant Header
@@ -14,24 +25,26 @@ class AccountScreen extends StatelessWidget {
             expandedHeight: 220,
             floating: false,
             pinned: true,
-            backgroundColor: Colors.black,
+            backgroundColor: isDark ? Colors.blueAccent : Colors.black,
             flexibleSpace: FlexibleSpaceBar(
               background: Container(
-                decoration: const BoxDecoration(
+                decoration: BoxDecoration(
                   gradient: LinearGradient(
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
-                    colors: [Colors.black87, Colors.black],
+                    colors: isDark
+                        ? [const Color(0xFF1A1A1A), Colors.blueAccent]
+                        : [Colors.black87, Colors.black],
                   ),
                 ),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     const SizedBox(height: 40),
-                    const CircleAvatar(
+                    CircleAvatar(
                       radius: 45,
-                      backgroundColor: Colors.white24,
-                      child: CircleAvatar(
+                      backgroundColor: Colors.white.withValues(alpha: 0.2),
+                      child: const CircleAvatar(
                         radius: 42,
                         backgroundImage: NetworkImage(
                           "https://img.freepik.com/free-photo/young-bearded-man-with-striped-shirt_273609-5677.jpg",
@@ -67,22 +80,112 @@ class AccountScreen extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  _buildSectionHeader("Account Settings"),
-                  _buildMenuItem(Icons.person_outline, "Personal Information"),
-                  _buildMenuItem(Icons.favorite_border, "Your Favorites"),
-                  _buildMenuItem(Icons.payment_outlined, "Payment Methods"),
+                  _buildSectionHeader("Account Settings", context),
+                  _buildMenuItem(
+                    context,
+                    Icons.person_outline,
+                    "Personal Information",
+                    () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const ProfileDetailsScreen(),
+                      ),
+                    ),
+                  ),
+                  _buildMenuItem(
+                    context,
+                    Icons.favorite_border,
+                    "Your Favorites",
+                    () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const FavoritesScreen(),
+                      ),
+                    ),
+                  ),
+                  _buildMenuItem(
+                    context,
+                    Icons.payment_outlined,
+                    "Payment Methods",
+                    () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const WalletScreen(),
+                      ),
+                    ),
+                  ),
 
                   const SizedBox(height: 25),
-                  _buildSectionHeader("Preferences"),
-                  _buildMenuItem(Icons.notifications_none, "Notifications"),
-                  _buildMenuItem(Icons.language_outlined, "Language"),
-                  _buildMenuItem(Icons.dark_mode_outlined, "Appearance"),
+                  _buildSectionHeader("Preferences", context),
+                  _buildMenuItem(
+                    context,
+                    Icons.notifications_none,
+                    "Notifications",
+                    () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const NotificationsScreen(),
+                      ),
+                    ),
+                  ),
+                  _buildMenuItem(
+                    context,
+                    Icons.language_outlined,
+                    "Language",
+                    () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const LanguageScreen(),
+                      ),
+                    ),
+                  ),
+                  _buildMenuItem(
+                    context,
+                    Icons.dark_mode_outlined,
+                    "Appearance",
+                    () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const AppearanceScreen(),
+                      ),
+                    ),
+                  ),
 
                   const SizedBox(height: 25),
-                  _buildSectionHeader("Support"),
-                  _buildMenuItem(Icons.help_outline, "Help Center"),
-                  _buildMenuItem(Icons.policy_outlined, "Privacy Policy"),
-                  _buildMenuItem(Icons.info_outline, "About Rydo"),
+                  _buildSectionHeader("Support", context),
+                  _buildMenuItem(
+                    context,
+                    Icons.help_outline,
+                    "Help Center",
+                    () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const HelpCenterScreen(),
+                      ),
+                    ),
+                  ),
+                  _buildMenuItem(
+                    context,
+                    Icons.policy_outlined,
+                    "Privacy Policy",
+                    () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const PrivacyPolicyScreen(),
+                      ),
+                    ),
+                  ),
+                  _buildMenuItem(
+                    context,
+                    Icons.info_outline,
+                    "About Rydo",
+                    () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const AboutRydoScreen(),
+                      ),
+                    ),
+                  ),
 
                   const SizedBox(height: 40),
                   // Logout Button
@@ -108,10 +211,13 @@ class AccountScreen extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 10),
-                  const Center(
+                  Center(
                     child: Text(
                       "Version 1.0.0",
-                      style: TextStyle(color: Colors.black26, fontSize: 12),
+                      style: TextStyle(
+                        color: isDark ? Colors.white24 : Colors.black26,
+                        fontSize: 12,
+                      ),
                     ),
                   ),
                 ],
@@ -123,7 +229,8 @@ class AccountScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildSectionHeader(String title) {
+  Widget _buildSectionHeader(String title, BuildContext context) {
+    final bool isDark = Theme.of(context).brightness == Brightness.dark;
     return Padding(
       padding: const EdgeInsets.only(left: 4, bottom: 12),
       child: Text(
@@ -131,18 +238,24 @@ class AccountScreen extends StatelessWidget {
         style: TextStyle(
           fontSize: 14,
           fontWeight: FontWeight.w600,
-          color: Colors.black.withValues(alpha: 0.4),
+          color: isDark ? Colors.white38 : Colors.black.withValues(alpha: 0.4),
           letterSpacing: 1.2,
         ),
       ),
     );
   }
 
-  Widget _buildMenuItem(IconData icon, String title) {
+  Widget _buildMenuItem(
+    BuildContext context,
+    IconData icon,
+    String title,
+    VoidCallback onTap,
+  ) {
+    final bool isDark = Theme.of(context).brightness == Brightness.dark;
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: isDark ? const Color(0xFF1E1E1E) : Colors.white,
         borderRadius: BorderRadius.circular(18),
         boxShadow: [
           BoxShadow(
@@ -153,21 +266,25 @@ class AccountScreen extends StatelessWidget {
         ],
       ),
       child: ListTile(
-        leading: Icon(icon, color: Colors.black87, size: 24),
+        leading: Icon(
+          icon,
+          color: isDark ? Colors.white70 : Colors.black87,
+          size: 24,
+        ),
         title: Text(
           title,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.w500,
-            color: Colors.black87,
+            color: isDark ? Colors.white : Colors.black87,
           ),
         ),
-        trailing: const Icon(
+        trailing: Icon(
           Icons.arrow_forward_ios,
           size: 14,
-          color: Colors.black26,
+          color: isDark ? Colors.white24 : Colors.black26,
         ),
-        onTap: () {},
+        onTap: onTap,
       ),
     );
   }

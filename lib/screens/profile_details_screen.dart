@@ -1,7 +1,67 @@
 import 'package:flutter/material.dart';
+import 'package:rydo/database/mongodb.dart';
 
-class ProfileDetailsScreen extends StatelessWidget {
+class ProfileDetailsScreen extends StatefulWidget {
   const ProfileDetailsScreen({super.key});
+
+  @override
+  State<ProfileDetailsScreen> createState() => _ProfileDetailsScreenState();
+}
+
+class _ProfileDetailsScreenState extends State<ProfileDetailsScreen> {
+  bool _isEditing = false;
+  bool _isLoading = false;
+
+  late TextEditingController _nameController;
+  late TextEditingController _addressController;
+
+  @override
+  void initState() {
+    super.initState();
+    _nameController = TextEditingController(
+      text: MongoDatabase.currentUser?["name"] ?? "",
+    );
+    _addressController = TextEditingController(
+      text: MongoDatabase.currentUser?["address"] ?? "",
+    );
+  }
+
+  @override
+  void dispose() {
+    _nameController.dispose();
+    _addressController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _saveProfile() async {
+    setState(() {
+      _isLoading = true;
+    });
+
+    final error = await MongoDatabase.updateProfile(
+      MongoDatabase.currentUser!["_id"],
+      _nameController.text,
+      _addressController.text,
+    );
+
+    setState(() {
+      _isLoading = false;
+      if (error == null) {
+        _isEditing = false;
+      }
+    });
+
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            error == null ? "Profile updated successfully!" : "Error: $error",
+          ),
+          backgroundColor: error == null ? Colors.green : Colors.red,
+        ),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -19,42 +79,40 @@ class ProfileDetailsScreen extends StatelessWidget {
                 const SizedBox(height: 32),
                 _buildSectionTitle("Contact Details"),
                 const SizedBox(height: 16),
-                _buildInfoCard(
+                _buildEditableInfoCard(
                   icon: Icons.person_outline_rounded,
                   label: "Full Name",
-                  value: "Khuzaim Sajjad",
+                  controller: _nameController,
+                  isEditable: true,
                 ),
                 _buildInfoCard(
                   icon: Icons.email_outlined,
                   label: "Email Address",
-                  value: "khuzaim.dev@example.com",
+                  value: MongoDatabase.currentUser?["email"] ?? "Not set",
                   isVerified: true,
                 ),
                 _buildInfoCard(
                   icon: Icons.phone_android_rounded,
                   label: "Phone Number",
-                  value: "+92 300 1234567",
+                  value: MongoDatabase.currentUser?["phone"] ?? "Not set",
                   isVerified: true,
-                ),
-                const SizedBox(height: 24),
-                _buildSectionTitle("Personal Details"),
-                const SizedBox(height: 16),
-                _buildInfoCard(
-                  icon: Icons.cake_outlined,
-                  label: "Date of Birth",
-                  value: "15 Jan 2000",
-                ),
-                _buildInfoCard(
-                  icon: Icons.location_on_outlined,
-                  label: "Address",
-                  value: "Gulberg III, Lahore, Pakistan",
                 ),
                 const SizedBox(height: 40),
                 SizedBox(
                   width: double.infinity,
                   height: 60,
                   child: ElevatedButton(
-                    onPressed: () => Navigator.pop(context),
+                    onPressed: _isLoading
+                        ? null
+                        : () {
+                            if (_isEditing) {
+                              _saveProfile();
+                            } else {
+                              setState(() {
+                                _isEditing = true;
+                              });
+                            }
+                          },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.black,
                       foregroundColor: Colors.white,
@@ -63,13 +121,15 @@ class ProfileDetailsScreen extends StatelessWidget {
                         borderRadius: BorderRadius.circular(20),
                       ),
                     ),
-                    child: const Text(
-                      "Update Profile",
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
+                    child: _isLoading
+                        ? const CircularProgressIndicator(color: Colors.white)
+                        : Text(
+                            _isEditing ? "Save Changes" : "Edit Profile",
+                            style: const TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
                   ),
                 ),
                 const SizedBox(height: 40),
@@ -97,12 +157,24 @@ class ProfileDetailsScreen extends StatelessWidget {
       ),
       actions: [
         IconButton(
-          icon: const Icon(
-            Icons.edit_note_rounded,
+          icon: Icon(
+            _isEditing ? Icons.close : Icons.edit_note_rounded,
             color: Colors.white,
             size: 28,
           ),
-          onPressed: () {},
+          onPressed: () {
+            setState(() {
+              if (_isEditing) {
+                // Cancel editing, revert changes
+                _nameController.text = MongoDatabase.currentUser?["name"] ?? "";
+                _addressController.text =
+                    MongoDatabase.currentUser?["address"] ?? "";
+                _isEditing = false;
+              } else {
+                _isEditing = true;
+              }
+            });
+          },
         ),
       ],
       flexibleSpace: FlexibleSpaceBar(
@@ -166,9 +238,9 @@ class ProfileDetailsScreen extends StatelessWidget {
   Widget _buildHeaderInfo() {
     return Column(
       children: [
-        const Text(
-          "Khuzaim Sajjad",
-          style: TextStyle(
+        Text(
+          MongoDatabase.currentUser?["name"] ?? "User Name",
+          style: const TextStyle(
             fontSize: 24,
             fontWeight: FontWeight.w900,
             color: Colors.black87,
@@ -206,6 +278,83 @@ class ProfileDetailsScreen extends StatelessWidget {
         fontWeight: FontWeight.w800,
         color: Colors.black38,
         letterSpacing: 1.2,
+      ),
+    );
+  }
+
+  Widget _buildEditableInfoCard({
+    required IconData icon,
+    required String label,
+    required TextEditingController controller,
+    required bool isEditable,
+  }) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 16),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.02),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: Colors.grey[50],
+              borderRadius: BorderRadius.circular(14),
+            ),
+            child: Icon(icon, color: Colors.black87, size: 22),
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  label,
+                  style: TextStyle(
+                    color: Colors.grey[500],
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                if (_isEditing && isEditable)
+                  TextField(
+                    controller: controller,
+                    style: const TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black87,
+                    ),
+                    decoration: const InputDecoration(
+                      isDense: true,
+                      contentPadding: EdgeInsets.symmetric(vertical: 4),
+                      border: InputBorder.none,
+                    ),
+                  )
+                else
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 4),
+                    child: Text(
+                      controller.text.isEmpty ? "Not set" : controller.text,
+                      style: const TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black87,
+                      ),
+                    ),
+                  ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -279,7 +428,6 @@ class ProfileDetailsScreen extends StatelessWidget {
               ],
             ),
           ),
-          const Icon(Icons.chevron_right_rounded, color: Colors.black12),
         ],
       ),
     );

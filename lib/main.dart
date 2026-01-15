@@ -1,9 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:rydo/screens/splash_screen.dart';
-
 import 'package:rydo/theme/theme_manager.dart';
+import 'package:rydo/database/mongodb.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  try {
+    await MongoDatabase.connect();
+  } catch (e) {
+    // Continue even if DB fails initially, it will retry on signup
+    debugPrint("Initial DB Connection failed: $e");
+  }
   runApp(const MyApp());
 }
 

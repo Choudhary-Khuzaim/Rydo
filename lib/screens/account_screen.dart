@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:rydo/screens/login_screen.dart';
 import 'package:rydo/screens/profile_details_screen.dart';
 import 'package:rydo/screens/favorites_screen.dart';
 import 'package:rydo/screens/wallet_screen.dart';
@@ -8,9 +9,44 @@ import 'package:rydo/screens/appearance_screen.dart';
 import 'package:rydo/screens/help_center_screen.dart';
 import 'package:rydo/screens/privacy_policy_screen.dart';
 import 'package:rydo/screens/about_rydo_screen.dart';
+import 'package:rydo/database/mongodb.dart';
 
-class AccountScreen extends StatelessWidget {
+class AccountScreen extends StatefulWidget {
   const AccountScreen({super.key});
+
+  @override
+  State<AccountScreen> createState() => _AccountScreenState();
+}
+
+class _AccountScreenState extends State<AccountScreen> {
+  void _showLogoutDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text("Logout"),
+          content: const Text("Are you sure you want to logout?"),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(), // Cancel
+              child: const Text("Cancel"),
+            ),
+            TextButton(
+              onPressed: () {
+                MongoDatabase.logout(); // Clear session
+                Navigator.of(context).pop(); // Close dialog
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (context) => const LoginScreen()),
+                );
+              },
+              child: const Text("Logout", style: TextStyle(color: Colors.red)),
+            ),
+          ],
+        );
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -52,16 +88,17 @@ class AccountScreen extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 12),
-                    const Text(
-                      "Khuzaim Sajjad",
-                      style: TextStyle(
+                    Text(
+                      MongoDatabase.currentUser?["name"] ?? "User",
+                      style: const TextStyle(
                         color: Colors.white,
                         fontSize: 22,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
                     Text(
-                      "khuzaim.dev@example.com",
+                      MongoDatabase.currentUser?["email"] ??
+                          "email@example.com",
                       style: TextStyle(
                         color: Colors.white.withValues(alpha: 0.6),
                         fontSize: 14,
@@ -85,12 +122,16 @@ class AccountScreen extends StatelessWidget {
                     context,
                     Icons.person_outline,
                     "Personal Information",
-                    () => Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const ProfileDetailsScreen(),
-                      ),
-                    ),
+                    () async {
+                      await Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const ProfileDetailsScreen(),
+                        ),
+                      );
+                      // Set state to refresh the UI with updated user data
+                      setState(() {});
+                    },
                   ),
                   _buildMenuItem(
                     context,
@@ -193,7 +234,7 @@ class AccountScreen extends StatelessWidget {
                     width: double.infinity,
                     height: 55,
                     child: OutlinedButton(
-                      onPressed: () {},
+                      onPressed: () => _showLogoutDialog(context),
                       style: OutlinedButton.styleFrom(
                         side: const BorderSide(color: Colors.redAccent),
                         shape: RoundedRectangleBorder(

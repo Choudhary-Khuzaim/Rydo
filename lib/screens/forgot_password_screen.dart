@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'dart:ui';
 
 class ForgotPasswordScreen extends StatefulWidget {
   const ForgotPasswordScreen({super.key});
@@ -13,132 +14,214 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0,
-        leading: IconButton(
-          icon: const Icon(
-            Icons.arrow_back_ios_new,
-            color: Colors.black,
-            size: 20,
+      body: Stack(
+        children: [
+          // 1. Premium Dark Background
+          Container(
+            decoration: const BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [
+                  Color(0xFF0F2027), // Deep Dark Blue
+                  Color(0xFF203A43), // Rich Teal/Blue
+                  Color(0xFF2C5364), // Lighter Teal
+                ],
+              ),
+            ),
           ),
-          onPressed: () => Navigator.pop(context),
-        ),
-      ),
-      body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 20),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: Colors.blue[50],
-                  shape: BoxShape.circle,
-                ),
-                child: Icon(
-                  Icons.lock_reset_rounded,
-                  size: 40,
-                  color: Colors.blue[600],
-                ),
-              ),
-              const SizedBox(height: 24),
-              const Text(
-                "Forgot Password?",
-                style: TextStyle(
-                  fontSize: 32,
-                  fontWeight: FontWeight.w900,
-                  color: Colors.black,
-                  letterSpacing: -0.5,
-                ),
-              ),
-              const SizedBox(height: 12),
-              Text(
-                "Don't worry! It happens. Please enter the email address associated with your account.",
-                style: TextStyle(
-                  fontSize: 16,
-                  color: Colors.black.withValues(alpha: 0.5),
-                  height: 1.5,
-                ),
-              ),
-              const SizedBox(height: 48),
 
-              const Text(
-                "Email Address",
-                style: TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black87,
-                ),
+          // 2. Abstract Geometric Overlay
+          Positioned(
+            top: -100,
+            left: -50,
+            child: Container(
+              width: 300,
+              height: 300,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: Colors.white.withValues(alpha: 0.05),
               ),
-              const SizedBox(height: 10),
-              Container(
-                decoration: BoxDecoration(
-                  color: Colors.grey[50],
-                  borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: Colors.grey[200]!),
-                ),
-                child: TextField(
-                  controller: _emailController,
-                  keyboardType: TextInputType.emailAddress,
-                  decoration: const InputDecoration(
-                    prefixIcon: Icon(
-                      Icons.email_outlined,
-                      color: Colors.black54,
+            ),
+          ),
+          Positioned(
+            bottom: -50,
+            right: -50,
+            child: Container(
+              width: 200,
+              height: 200,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: Colors.blueAccent.withValues(alpha: 0.1),
+              ),
+            ),
+          ),
+
+          // 3. Main Content
+          SafeArea(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.symmetric(
+                horizontal: 24.0,
+                vertical: 20,
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  IconButton(
+                    icon: const Icon(
+                      Icons.arrow_back_ios_new,
+                      color: Colors.white,
+                      size: 20,
                     ),
-                    hintText: "Enter your email",
-                    hintStyle: TextStyle(color: Colors.black26),
-                    border: InputBorder.none,
-                    contentPadding: EdgeInsets.symmetric(vertical: 18),
+                    onPressed: () => Navigator.pop(context),
                   ),
-                ),
-              ),
-
-              const SizedBox(height: 48),
-
-              SizedBox(
-                width: double.infinity,
-                height: 60,
-                child: ElevatedButton(
-                  onPressed: () {
-                    // Show a nice success dialog or snackbar
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: const Text(
-                          "Password reset link sent to your email!",
-                        ),
-                        backgroundColor: Colors.green[600],
-                        behavior: SnackBarBehavior.floating,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
+                  const SizedBox(height: 30),
+                  Center(
+                    child: Container(
+                      padding: const EdgeInsets.all(20),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withValues(alpha: 0.1),
+                        shape: BoxShape.circle,
+                        border: Border.all(
+                          color: Colors.white.withValues(alpha: 0.2),
+                          width: 1,
                         ),
                       ),
-                    );
-                    final navigator = Navigator.of(context);
-                    Future.delayed(const Duration(seconds: 2), () {
-                      if (!mounted) return;
-                      navigator.pop();
-                    });
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.black,
-                    foregroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(20),
+                      child: const Icon(
+                        Icons.lock_reset_rounded,
+                        size: 50,
+                        color: Colors.white,
+                      ),
                     ),
-                    elevation: 0,
                   ),
-                  child: const Text(
-                    "Send Reset Link",
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800),
+                  const SizedBox(height: 30),
+                  const Text(
+                    "Forgot Password?",
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 32,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                      letterSpacing: 0.5,
+                    ),
                   ),
-                ),
+                  const SizedBox(height: 12),
+                  Text(
+                    "Don't worry! It happens. Please enter the email address associated with your account.",
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: Colors.white.withValues(alpha: 0.7),
+                      height: 1.5,
+                    ),
+                  ),
+                  const SizedBox(height: 40),
+
+                  // Glassmorphism Form Container
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(30),
+                    child: BackdropFilter(
+                      filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+                      child: Container(
+                        padding: const EdgeInsets.all(32),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withValues(alpha: 0.1),
+                          borderRadius: BorderRadius.circular(30),
+                          border: Border.all(
+                            color: Colors.white.withValues(alpha: 0.2),
+                            width: 1,
+                          ),
+                        ),
+                        child: Column(
+                          children: [
+                            Container(
+                              decoration: BoxDecoration(
+                                color: Colors.black.withValues(alpha: 0.2),
+                                borderRadius: BorderRadius.circular(15),
+                                border: Border.all(
+                                  color: Colors.white.withValues(alpha: 0.1),
+                                  width: 1,
+                                ),
+                              ),
+                              child: TextField(
+                                controller: _emailController,
+                                keyboardType: TextInputType.emailAddress,
+                                style: const TextStyle(color: Colors.white),
+                                cursorColor: Colors.white,
+                                decoration: InputDecoration(
+                                  prefixIcon: const Icon(
+                                    Icons.email_outlined,
+                                    color: Colors.white70,
+                                  ),
+                                  hintText: "Enter your email",
+                                  hintStyle: TextStyle(
+                                    color: Colors.white.withValues(alpha: 0.5),
+                                  ),
+                                  border: InputBorder.none,
+                                  contentPadding: const EdgeInsets.symmetric(
+                                    vertical: 16,
+                                  ),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: 30),
+                            SizedBox(
+                              width: double.infinity,
+                              height: 55,
+                              child: ElevatedButton(
+                                onPressed: () {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: const Text(
+                                        "Password reset link sent to your email!",
+                                      ),
+                                      backgroundColor: Colors.green,
+                                      behavior: SnackBarBehavior.floating,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(10),
+                                      ),
+                                    ),
+                                  );
+                                  final navigator = Navigator.of(context);
+                                  Future.delayed(
+                                    const Duration(seconds: 2),
+                                    () {
+                                      if (!mounted) return;
+                                      navigator.pop();
+                                    },
+                                  );
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.white,
+                                  foregroundColor: const Color(0xFF0F2027),
+                                  shadowColor: Colors.black.withValues(
+                                    alpha: 0.3,
+                                  ),
+                                  elevation: 5,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(15),
+                                  ),
+                                ),
+                                child: const Text(
+                                  "SEND RESET LINK",
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                    letterSpacing: 1.2,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
               ),
-            ],
+            ),
           ),
-        ),
+        ],
       ),
     );
   }

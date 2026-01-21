@@ -12,6 +12,10 @@ import 'package:rydo/screens/finding_driver_screen.dart';
 import 'package:rydo/screens/driver_details_screen.dart';
 import 'package:rydo/apis/osm_api.dart';
 import 'package:rydo/services/route_service.dart';
+import 'package:rydo/screens/trips_screen.dart';
+import 'package:rydo/screens/wallet_screen.dart';
+import 'package:rydo/screens/account_screen.dart';
+import 'package:rydo/database/mongodb.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -30,6 +34,7 @@ class _HomeScreenState extends State<HomeScreen> {
   bool _showFarePanel = false;
   bool _isLocating = false;
   StreamSubscription<Position>? _positionSubscription;
+  Map<String, int> _distanceDuration = {"distance": 5, "duration": 15};
 
   static const LatLng _kDefaultLocation = LatLng(
     37.42796133580664,
@@ -82,8 +87,6 @@ class _HomeScreenState extends State<HomeScreen> {
   void _updateUserMarker(Position position) async {
     final latLng = LatLng(position.latitude, position.longitude);
 
-    // Only update address if we don't have one or if the position changed significantly
-    // (Optimization: distance filter already handles some of this)
     if (_currentPosition == null ||
         Geolocator.distanceBetween(
               _currentPosition!.latitude,
@@ -91,7 +94,7 @@ class _HomeScreenState extends State<HomeScreen> {
               position.latitude,
               position.longitude,
             ) >
-            100) {
+            50) {
       String address = await _locationService.getAddressFromLatLng(
         position.latitude,
         position.longitude,
@@ -110,14 +113,42 @@ class _HomeScreenState extends State<HomeScreen> {
         // Update or add the user location marker
         final userMarker = Marker(
           point: _currentPosition!,
-          width: 80,
-          height: 80,
-          child: const Icon(
-            Icons.location_history,
-            color: Colors.blue,
-            size: 40,
+          width: 60,
+          height: 60,
+          child: Container(
+            decoration: BoxDecoration(
+              color: Colors.blue.withValues(alpha: 0.2),
+              shape: BoxShape.circle,
+            ),
+            padding: const EdgeInsets.all(8),
+            child: Container(
+              decoration: const BoxDecoration(
+                color: Colors.white,
+                shape: BoxShape.circle,
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black26,
+                    blurRadius: 10,
+                    offset: Offset(0, 5),
+                  ),
+                ],
+              ),
+              child: const Icon(
+                Icons.navigation_rounded,
+                color: Colors.blue,
+                size: 25,
+              ),
+            ),
           ),
         );
+
+        if (_showFarePanel) {
+          // If showing route, we might want to update user position
+          // but not necessarily replace the first marker which is now the pickup
+          // For now, let's just skip user marker update when route is visible
+          // or we can manage a separate list.
+          return;
+        }
 
         if (_markers.isEmpty) {
           _markers.add(userMarker);
@@ -197,7 +228,24 @@ class _HomeScreenState extends State<HomeScreen> {
         );
 
         if (mounted) {
+          double totalDist = 0;
+          for (int i = 0; i < routePoints.length - 1; i++) {
+            totalDist += Geolocator.distanceBetween(
+              routePoints[i].latitude,
+              routePoints[i].longitude,
+              routePoints[i + 1].latitude,
+              routePoints[i + 1].longitude,
+            );
+          }
+          double distanceKm = totalDist / 1000;
+          int durationMins = (distanceKm * 2.5).round(); // ~24km/h avg
+          if (durationMins < 3) durationMins = 3;
+
           setState(() {
+            _distanceDuration = {
+              "distance": distanceKm.round(),
+              "duration": durationMins,
+            };
             _polylines.add(
               Polyline(
                 points: routePoints,
@@ -273,30 +321,57 @@ class _HomeScreenState extends State<HomeScreen> {
               decoration: BoxDecoration(
                 color: isDark ? Colors.blueAccent : Colors.black,
               ),
-              accountName: const Text("John Doe"),
-              accountEmail: const Text("john.doe@example.com"),
+              accountName: Text(MongoDatabase.currentUser?["name"] ?? "User"),
+              accountEmail: Text(
+                MongoDatabase.currentUser?["email"] ?? "user@example.com",
+              ),
               currentAccountPicture: CircleAvatar(
                 backgroundColor: isDark ? Colors.black : Colors.white,
                 child: Text(
-                  "JD",
-                  style: TextStyle(color: isDark ? Colors.white : Colors.black),
+                  (MongoDatabase.currentUser?["name"] ?? "U")
+                      .substring(0, 1)
+                      .toUpperCase(),
+                  style: TextStyle(
+                    color: isDark ? Colors.white : Colors.black,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ),
             ),
             ListTile(
               leading: const Icon(Icons.history),
               title: const Text('Your Trips'),
-              onTap: () {},
+              onTap: () {
+                Navigator.pop(context); // Close drawer
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const TripsScreen()),
+                );
+              },
             ),
             ListTile(
               leading: const Icon(Icons.payment),
               title: const Text('Payment'),
-              onTap: () {},
+              onTap: () {
+                Navigator.pop(context); // Close drawer
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const WalletScreen()),
+                );
+              },
             ),
             ListTile(
               leading: const Icon(Icons.settings),
               title: const Text('Settings'),
-              onTap: () {},
+              onTap: () {
+                Navigator.pop(context); // Close drawer
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const AccountScreen(),
+                  ),
+                );
+              },
             ),
           ],
         ),
@@ -348,8 +423,34 @@ class _HomeScreenState extends State<HomeScreen> {
             left: 20,
             right: 20,
             child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
               children: [
+                // Menu Button
+                Builder(
+                  builder: (context) {
+                    return GestureDetector(
+                      onTap: () => Scaffold.of(context).openDrawer(),
+                      child: Container(
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: Theme.of(context).cardColor,
+                          shape: BoxShape.circle,
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withValues(alpha: 0.1),
+                              blurRadius: 10,
+                              offset: const Offset(0, 4),
+                            ),
+                          ],
+                        ),
+                        child: Icon(
+                          Icons.menu,
+                          color: Theme.of(context).iconTheme.color,
+                        ),
+                      ),
+                    );
+                  },
+                ),
+                const Spacer(),
                 // Location Picker
                 Container(
                   padding: const EdgeInsets.symmetric(
@@ -369,14 +470,17 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                   child: Row(
                     children: [
-                      Text(
-                        _currentAddress,
-                        style: TextStyle(
-                          color: Theme.of(context).textTheme.bodyLarge?.color,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 14,
+                      ConstrainedBox(
+                        constraints: const BoxConstraints(maxWidth: 150),
+                        child: Text(
+                          _currentAddress,
+                          style: TextStyle(
+                            color: Theme.of(context).textTheme.bodyLarge?.color,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 14,
+                          ),
+                          overflow: TextOverflow.ellipsis,
                         ),
-                        overflow: TextOverflow.ellipsis,
                       ),
                       const SizedBox(width: 4),
                       Icon(
@@ -389,6 +493,8 @@ class _HomeScreenState extends State<HomeScreen> {
                     ],
                   ),
                 ),
+                const Spacer(),
+                const SizedBox(width: 48), // Spacer for balance
               ],
             ),
           ),
@@ -452,7 +558,7 @@ class _HomeScreenState extends State<HomeScreen> {
               left: 0,
               right: 0,
               child: RideSelectionSheet(
-                distanceDuration: const {"distance": 5, "duration": 15},
+                distanceDuration: _distanceDuration,
                 onRideSelected: _onRideSelected,
               ),
             ),

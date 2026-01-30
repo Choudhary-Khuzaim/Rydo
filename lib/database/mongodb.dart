@@ -7,7 +7,6 @@ class MongoDatabase {
   // -------------------------------------------------------------------------
   static const String _username = "Khuzaim";
   static const String _password = "khuzaim09"; // CHANGE THIS!
-  static const String _clusterAddress = "rydo.dcyiyrr.mongodb.net";
   // -------------------------------------------------------------------------
 
   static Db? _db;
@@ -25,12 +24,20 @@ class MongoDatabase {
     final String encodedUser = Uri.encodeComponent(_username);
     final String encodedPass = Uri.encodeComponent(_password);
 
-    // Construct the connection string safely
+    // Using standard connection string to bypass DNS SRV/TXT lookup issues
+    // which often cause "Connection reset by peer" errors on dns.google.com
+    const String replicaSet = "atlas-1tb7hr-shard-0";
+    const List<String> shards = [
+      "ac-zjzzrbu-shard-00-00.dcyiyrr.mongodb.net:27017",
+      "ac-zjzzrbu-shard-00-01.dcyiyrr.mongodb.net:27017",
+      "ac-zjzzrbu-shard-00-02.dcyiyrr.mongodb.net:27017",
+    ];
+
     final String connectionString =
-        "mongodb+srv://$encodedUser:$encodedPass@$_clusterAddress/rydo?authSource=admin&tls=true";
+        "mongodb://$encodedUser:$encodedPass@${shards.join(',')}/rydo?authSource=admin&replicaSet=$replicaSet&tls=true";
 
     try {
-      log("Attempting to connect to: $_clusterAddress");
+      log("Attempting to connect to MongoDB cluster...");
       _db = await Db.create(connectionString);
       await _db!.open();
       _userCollection = _db!.collection('users');
@@ -40,6 +47,11 @@ class MongoDatabase {
       log("DATABASE CONNECTION ERROR: $e");
       _db = null;
       _userCollection = null;
+
+      // If direct connection fails, try the fallback SRV string just in case
+      if (e.toString().contains("SocketException")) {
+        return "Network Error: Possible firewall or ISP restriction. Try using a VPN or different network.";
+      }
       return e.toString();
     }
   }

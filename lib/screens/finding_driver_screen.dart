@@ -1,4 +1,6 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:rydo/screens/driver_details_screen.dart';
 
 class FindingDriverScreen extends StatefulWidget {
   const FindingDriverScreen({super.key});
@@ -10,6 +12,7 @@ class FindingDriverScreen extends StatefulWidget {
 class _FindingDriverScreenState extends State<FindingDriverScreen>
     with TickerProviderStateMixin {
   late AnimationController _controller;
+  Timer? _transitionTimer;
 
   @override
   void initState() {
@@ -19,10 +22,21 @@ class _FindingDriverScreenState extends State<FindingDriverScreen>
       lowerBound: 0.5,
       duration: const Duration(seconds: 3),
     )..repeat();
+
+    // Transition to driver details after 4 seconds of searching
+    _transitionTimer = Timer(const Duration(seconds: 4), () {
+      if (mounted) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const DriverDetailsScreen()),
+        );
+      }
+    });
   }
 
   @override
   void dispose() {
+    _transitionTimer?.cancel();
     _controller.dispose();
     super.dispose();
   }

@@ -2,12 +2,8 @@ import 'package:mongo_dart/mongo_dart.dart';
 import 'dart:developer';
 
 class MongoDatabase {
-  // -------------------------------------------------------------------------
-  // STEP 1: Enter your MongoDB credentials here.
-  // -------------------------------------------------------------------------
   static const String _username = "Khuzaim";
-  static const String _password = "khuzaim09"; // CHANGE THIS!
-  // -------------------------------------------------------------------------
+  static const String _password = "khuzaim09";
 
   static Db? _db;
   static DbCollection? _userCollection;
@@ -20,12 +16,9 @@ class MongoDatabase {
       return "Please open lib/database/mongodb.dart and enter your actual password.";
     }
 
-    // Auto-encode credentials to handle special characters like @, :, #
     final String encodedUser = Uri.encodeComponent(_username);
     final String encodedPass = Uri.encodeComponent(_password);
 
-    // Using standard connection string to bypass DNS SRV/TXT lookup issues
-    // which often cause "Connection reset by peer" errors on dns.google.com
     const String replicaSet = "atlas-1tb7hr-shard-0";
     const List<String> shards = [
       "ac-zjzzrbu-shard-00-00.dcyiyrr.mongodb.net:27017",

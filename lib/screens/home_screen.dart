@@ -9,7 +9,6 @@ import 'package:rydo/services/location_service.dart';
 import 'package:rydo/screens/search_screen.dart';
 import 'package:rydo/widgets/ride_selection_sheet.dart';
 import 'package:rydo/screens/finding_driver_screen.dart';
-import 'package:rydo/screens/driver_details_screen.dart';
 import 'package:rydo/apis/osm_api.dart';
 import 'package:rydo/services/route_service.dart';
 import 'package:rydo/screens/trips_screen.dart';
@@ -272,34 +271,25 @@ class _HomeScreenState extends State<HomeScreen> {
     Navigator.push(
       context,
       MaterialPageRoute(builder: (context) => const FindingDriverScreen()),
-    );
-
-    Future.delayed(const Duration(seconds: 4), () {
+    ).then((_) {
       if (mounted) {
-        Navigator.pop(context); // Pop Finding Driver
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => const DriverDetailsScreen()),
-        ).then((_) {
-          setState(() {
-            _showFarePanel = false;
-            // _destinationName = null; // Removed
-            _polylines.clear();
-            if (_currentPosition != null) {
-              _markers = [
-                Marker(
-                  point: _currentPosition!,
-                  width: 80,
-                  height: 80,
-                  child: const Icon(
-                    Icons.location_on,
-                    color: Colors.blue,
-                    size: 40,
-                  ),
+        setState(() {
+          _showFarePanel = false;
+          _polylines.clear();
+          if (_currentPosition != null) {
+            _markers = [
+              Marker(
+                point: _currentPosition!,
+                width: 80,
+                height: 80,
+                child: const Icon(
+                  Icons.location_on,
+                  color: Colors.blue,
+                  size: 40,
                 ),
-              ];
-            }
-          });
+              ),
+            ];
+          }
         });
       }
     });

@@ -10,7 +10,7 @@ class MongoDatabase {
   static Map<String, dynamic>? currentUser;
 
   static Future<String?> connect() async {
-    if (_db != null && _db!.state == State.OPEN) return null;
+    if (_db != null && _db!.state == State.open) return null;
 
     if (_password == "your_real_password_here" || _password.contains("*")) {
       return "Please open lib/database/mongodb.dart and enter your actual password.";
@@ -51,13 +51,13 @@ class MongoDatabase {
 
   static Future<String?> insert(Map<String, dynamic> data) async {
     try {
-      if (_db == null || _db!.state != State.OPEN) {
+      if (_db == null || _db!.state != State.open) {
         log("Database not connected, attempting to connect...");
         var connectError = await connect();
         if (connectError != null) return connectError;
       }
 
-      if (_db == null || _db!.state != State.OPEN) {
+      if (_db == null || _db!.state != State.open) {
         return "Database connection failed. Check your internet or password.";
       }
 
@@ -81,7 +81,7 @@ class MongoDatabase {
     String password,
   ) async {
     try {
-      if (_db == null || _db!.state != State.OPEN) {
+      if (_db == null || _db!.state != State.open) {
         log("Database not connected, attempting to connect...");
         var connectError = await connect();
         if (connectError != null) {
@@ -114,7 +114,7 @@ class MongoDatabase {
     String address,
   ) async {
     try {
-      if (_db == null || _db!.state != State.OPEN) {
+      if (_db == null || _db!.state != State.open) {
         var connectError = await connect();
         if (connectError != null) return connectError;
       }

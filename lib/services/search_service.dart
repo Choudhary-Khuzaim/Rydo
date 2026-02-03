@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:developer';
 import 'package:http/http.dart' as http;
 import 'package:rydo/apis/osm_api.dart';
 
@@ -28,7 +29,7 @@ class SearchService {
             .toList();
       }
     } catch (e) {
-      print('Search error: $e');
+      log('Search error: $e');
     }
     return [];
   }

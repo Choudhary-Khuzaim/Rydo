@@ -182,7 +182,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
         child: SwitchListTile(
           value: value,
           onChanged: onChanged,
-          activeColor: Colors.black,
+          activeThumbColor: Colors.black,
           secondary: Container(
             padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(

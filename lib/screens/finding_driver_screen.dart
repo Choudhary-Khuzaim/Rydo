@@ -1,9 +1,11 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:latlong2/latlong.dart';
 import 'package:rydo/screens/driver_details_screen.dart';
 
 class FindingDriverScreen extends StatefulWidget {
-  const FindingDriverScreen({super.key});
+  final LatLng userLocation;
+  const FindingDriverScreen({super.key, required this.userLocation});
 
   @override
   State<FindingDriverScreen> createState() => _FindingDriverScreenState();
@@ -28,7 +30,10 @@ class _FindingDriverScreenState extends State<FindingDriverScreen>
       if (mounted) {
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => const DriverDetailsScreen()),
+          MaterialPageRoute(
+            builder: (context) =>
+                DriverDetailsScreen(userLocation: widget.userLocation),
+          ),
         );
       }
     });

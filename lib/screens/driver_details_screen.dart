@@ -7,7 +7,8 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:rydo/services/route_service.dart';
 
 class DriverDetailsScreen extends StatefulWidget {
-  const DriverDetailsScreen({super.key});
+  final LatLng userLocation;
+  const DriverDetailsScreen({super.key, required this.userLocation});
 
   @override
   State<DriverDetailsScreen> createState() => _DriverDetailsScreenState();
@@ -19,9 +20,9 @@ class _DriverDetailsScreenState extends State<DriverDetailsScreen> {
   final double _progress = 0.7;
   final int _state = 0; // 0: Arriving, 1: Arrived, 2: In Progress, 3: Completed
 
-  // Mock driver and user locations in Karachi
-  final LatLng _driverLocation = const LatLng(24.8607, 67.0011);
-  final LatLng _userLocation = const LatLng(24.8716, 67.0599);
+  // Driver starts nearby the user
+  late LatLng _driverLocation;
+  late LatLng _userLocation;
 
   // Points will be updated dynamically
   List<LatLng> _routePoints = [];
@@ -29,6 +30,12 @@ class _DriverDetailsScreenState extends State<DriverDetailsScreen> {
   @override
   void initState() {
     super.initState();
+    _userLocation = widget.userLocation;
+    // Mock driver position: slightly offset from user
+    _driverLocation = LatLng(
+      _userLocation.latitude + 0.005,
+      _userLocation.longitude + 0.005,
+    );
     _fetchRoute();
   }
 

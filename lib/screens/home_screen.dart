@@ -270,7 +270,11 @@ class _HomeScreenState extends State<HomeScreen> {
   void _onRideSelected(String rideType, double price) {
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => const FindingDriverScreen()),
+      MaterialPageRoute(
+        builder: (context) => FindingDriverScreen(
+          userLocation: _currentPosition ?? _kDefaultLocation,
+        ),
+      ),
     ).then((_) {
       if (mounted) {
         setState(() {

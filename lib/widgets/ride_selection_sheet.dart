@@ -90,7 +90,7 @@ class _RideSelectionSheetState extends State<RideSelectionSheet> {
     final bool isDark = Theme.of(context).brightness == Brightness.dark;
 
     // Handle index reset if category change makes selected index invalid
-    if (_selectedIndex >= filtered.length) {
+    if (filtered.isNotEmpty && _selectedIndex >= filtered.length) {
       _selectedIndex = 0;
     }
 
@@ -212,151 +212,171 @@ class _RideSelectionSheetState extends State<RideSelectionSheet> {
           Flexible(
             child: AnimatedSwitcher(
               duration: const Duration(milliseconds: 300),
-              child: ListView.builder(
-                key: ValueKey(_selectedCategory),
-                shrinkWrap: true,
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                itemCount: filtered.length,
-                itemBuilder: (context, index) {
-                  final option = filtered[index];
-                  double price = _calculatePrice(option["basePrice"]);
-                  bool isSelected = _selectedIndex == index;
-
-                  return GestureDetector(
-                    onTap: () => setState(() => _selectedIndex = index),
-                    child: AnimatedContainer(
-                      duration: const Duration(milliseconds: 300),
-                      curve: Curves.easeOutCubic,
-                      margin: const EdgeInsets.only(bottom: 12),
-                      padding: const EdgeInsets.all(20),
-                      decoration: BoxDecoration(
-                        color: isSelected
-                            ? (isDark
-                                  ? Colors.blueAccent.withValues(alpha: 0.1)
-                                  : Colors.black)
-                            : Theme.of(context).cardColor,
-                        borderRadius: BorderRadius.circular(24),
-                        border: Border.all(
-                          color: isSelected
-                              ? (isDark ? Colors.blueAccent : Colors.black)
-                              : (isDark
-                                    ? const Color(0xFF2C2C2C)
-                                    : Colors.grey[100]!),
-                          width: 1.5,
+              child: filtered.isEmpty
+                  ? Center(
+                      child: Padding(
+                        padding: const EdgeInsets.all(40.0),
+                        child: Text(
+                          "No rides available in this category",
+                          style: TextStyle(
+                            color: isDark ? Colors.grey[400] : Colors.grey[600],
+                            fontSize: 16,
+                            fontWeight: FontWeight.w500,
+                          ),
                         ),
                       ),
-                      child: Row(
-                        children: [
-                          Container(
-                            height: 55,
-                            width: 55,
+                    )
+                  : ListView.builder(
+                      key: ValueKey(_selectedCategory),
+                      shrinkWrap: true,
+                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                      itemCount: filtered.length,
+                      itemBuilder: (context, index) {
+                        final option = filtered[index];
+                        double price = _calculatePrice(option["basePrice"]);
+                        bool isSelected = _selectedIndex == index;
+
+                        return GestureDetector(
+                          onTap: () => setState(() => _selectedIndex = index),
+                          child: AnimatedContainer(
+                            duration: const Duration(milliseconds: 300),
+                            curve: Curves.easeOutCubic,
+                            margin: const EdgeInsets.only(bottom: 12),
+                            padding: const EdgeInsets.all(20),
                             decoration: BoxDecoration(
-                              color: isSelected && !isDark
-                                  ? Colors.white.withValues(alpha: 0.1)
-                                  : (option["color"] as Color).withValues(
-                                      alpha: 0.1,
-                                    ),
-                              borderRadius: BorderRadius.circular(16),
+                              color: isSelected
+                                  ? (isDark
+                                        ? Colors.blueAccent.withValues(
+                                            alpha: 0.1,
+                                          )
+                                        : Colors.black)
+                                  : Theme.of(context).cardColor,
+                              borderRadius: BorderRadius.circular(24),
+                              border: Border.all(
+                                color: isSelected
+                                    ? (isDark
+                                          ? Colors.blueAccent
+                                          : Colors.black)
+                                    : (isDark
+                                          ? const Color(0xFF2C2C2C)
+                                          : Colors.grey[100]!),
+                                width: 1.5,
+                              ),
                             ),
-                            child: Icon(
-                              option["image"] as IconData,
-                              color: isSelected && !isDark
-                                  ? Colors.white
-                                  : option["color"] as Color,
-                              size: 28,
-                            ),
-                          ),
-                          const SizedBox(width: 16),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
+                            child: Row(
                               children: [
-                                Row(
+                                Container(
+                                  height: 55,
+                                  width: 55,
+                                  decoration: BoxDecoration(
+                                    color: isSelected && !isDark
+                                        ? Colors.white.withValues(alpha: 0.1)
+                                        : (option["color"] as Color).withValues(
+                                            alpha: 0.1,
+                                          ),
+                                    borderRadius: BorderRadius.circular(16),
+                                  ),
+                                  child: Icon(
+                                    option["image"] as IconData,
+                                    color: isSelected && !isDark
+                                        ? Colors.white
+                                        : option["color"] as Color,
+                                    size: 28,
+                                  ),
+                                ),
+                                const SizedBox(width: 16),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Row(
+                                        children: [
+                                          Text(
+                                            option["name"],
+                                            style: TextStyle(
+                                              color: isSelected && !isDark
+                                                  ? Colors.white
+                                                  : Theme.of(context)
+                                                        .textTheme
+                                                        .bodyLarge
+                                                        ?.color,
+                                              fontSize: 17,
+                                              fontWeight: FontWeight.w900,
+                                            ),
+                                          ),
+                                          const SizedBox(width: 8),
+                                          Icon(
+                                            Icons.person_rounded,
+                                            size: 12,
+                                            color: isSelected && !isDark
+                                                ? Colors.white60
+                                                : Colors.black26,
+                                          ),
+                                          Text(
+                                            " ${option['seats']}",
+                                            style: TextStyle(
+                                              fontSize: 11,
+                                              color: isSelected && !isDark
+                                                  ? Colors.white60
+                                                  : Colors.black26,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                      const SizedBox(height: 4),
+                                      Text(
+                                        option["desc"],
+                                        style: TextStyle(
+                                          color: isSelected && !isDark
+                                              ? Colors.white70
+                                              : (isDark
+                                                    ? Colors.grey[400]
+                                                    : Colors.grey[500]),
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.end,
                                   children: [
                                     Text(
-                                      option["name"],
+                                      "Rs.${price.toStringAsFixed(0)}",
                                       style: TextStyle(
                                         color: isSelected && !isDark
                                             ? Colors.white
                                             : Theme.of(
                                                 context,
                                               ).textTheme.bodyLarge?.color,
-                                        fontSize: 17,
+                                        fontSize: 18,
                                         fontWeight: FontWeight.w900,
+                                        letterSpacing: -0.5,
                                       ),
                                     ),
-                                    const SizedBox(width: 8),
-                                    Icon(
-                                      Icons.person_rounded,
-                                      size: 12,
-                                      color: isSelected && !isDark
-                                          ? Colors.white60
-                                          : Colors.black26,
-                                    ),
+                                    const SizedBox(height: 4),
                                     Text(
-                                      " ${option['seats']}",
+                                      option["eta"],
                                       style: TextStyle(
-                                        fontSize: 11,
                                         color: isSelected && !isDark
-                                            ? Colors.white60
-                                            : Colors.black26,
+                                            ? Colors.white70
+                                            : (isDark
+                                                  ? Colors.blueAccent
+                                                  : Colors.green[600]),
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.w900,
                                       ),
                                     ),
                                   ],
                                 ),
-                                const SizedBox(height: 4),
-                                Text(
-                                  option["desc"],
-                                  style: TextStyle(
-                                    color: isSelected && !isDark
-                                        ? Colors.white70
-                                        : (isDark
-                                              ? Colors.grey[400]
-                                              : Colors.grey[500]),
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                                ),
                               ],
                             ),
                           ),
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.end,
-                            children: [
-                              Text(
-                                "Rs.${price.toStringAsFixed(0)}",
-                                style: TextStyle(
-                                  color: isSelected && !isDark
-                                      ? Colors.white
-                                      : Theme.of(
-                                          context,
-                                        ).textTheme.bodyLarge?.color,
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.w900,
-                                  letterSpacing: -0.5,
-                                ),
-                              ),
-                              const SizedBox(height: 4),
-                              Text(
-                                option["eta"],
-                                style: TextStyle(
-                                  color: isSelected && !isDark
-                                      ? Colors.white70
-                                      : (isDark
-                                            ? Colors.blueAccent
-                                            : Colors.green[600]),
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.w900,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
+                        );
+                      },
                     ),
-                  );
-                },
-              ),
             ),
           ),
 

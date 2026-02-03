@@ -38,7 +38,7 @@ class _LanguageScreenState extends State<LanguageScreen> {
         .toList();
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF8F9FA),
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: CustomScrollView(
         slivers: [
           _buildSliverAppBar(context),
@@ -46,21 +46,25 @@ class _LanguageScreenState extends State<LanguageScreen> {
             padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
             sliver: SliverList(
               delegate: SliverChildListDelegate([
-                _buildSearchBar(),
+                _buildSearchBar(context),
                 if (searchQuery.isEmpty) ...[
                   const SizedBox(height: 32),
                   _buildSectionHeader("SUGGESTED LANGUAGES"),
                   const SizedBox(height: 16),
-                  ...suggestedLanguages.map((lang) => _buildLanguageCard(lang)),
+                  ...suggestedLanguages.map(
+                    (lang) => _buildLanguageCard(lang, context),
+                  ),
                 ],
                 const SizedBox(height: 32),
                 _buildSectionHeader(
                   searchQuery.isEmpty ? "ALL LANGUAGES" : "SEARCH RESULTS",
                 ),
                 const SizedBox(height: 16),
-                ...filteredLanguages.map((lang) => _buildLanguageCard(lang)),
+                ...filteredLanguages.map(
+                  (lang) => _buildLanguageCard(lang, context),
+                ),
                 const SizedBox(height: 40),
-                _buildConfirmButton(),
+                _buildConfirmButton(context),
                 const SizedBox(height: 40),
               ]),
             ),
@@ -71,11 +75,12 @@ class _LanguageScreenState extends State<LanguageScreen> {
   }
 
   Widget _buildSliverAppBar(BuildContext context) {
+    final bool isDark = Theme.of(context).brightness == Brightness.dark;
     return SliverAppBar(
       expandedHeight: 120,
       pinned: true,
       elevation: 0,
-      backgroundColor: Colors.black,
+      backgroundColor: isDark ? Colors.blueAccent : Colors.black,
       leading: IconButton(
         icon: const Icon(
           Icons.arrow_back_ios_new,
@@ -96,9 +101,11 @@ class _LanguageScreenState extends State<LanguageScreen> {
           ),
         ),
         background: Container(
-          decoration: const BoxDecoration(
+          decoration: BoxDecoration(
             gradient: LinearGradient(
-              colors: [Colors.black, Color(0xFF2D2D2D)],
+              colors: isDark
+                  ? [const Color(0xFF1A1A1A), Colors.blueAccent]
+                  : [Colors.black, const Color(0xFF2D2D2D)],
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
             ),
@@ -121,10 +128,11 @@ class _LanguageScreenState extends State<LanguageScreen> {
     );
   }
 
-  Widget _buildSearchBar() {
+  Widget _buildSearchBar(BuildContext context) {
+    final bool isDark = Theme.of(context).brightness == Brightness.dark;
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: isDark ? const Color(0xFF1E1E1E) : Colors.white,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
@@ -136,6 +144,7 @@ class _LanguageScreenState extends State<LanguageScreen> {
       ),
       child: TextField(
         onChanged: (value) => setState(() => searchQuery = value),
+        style: TextStyle(color: isDark ? Colors.white : Colors.black),
         decoration: InputDecoration(
           hintText: "Search language...",
           hintStyle: TextStyle(color: Colors.grey[400], fontSize: 14),
@@ -159,8 +168,9 @@ class _LanguageScreenState extends State<LanguageScreen> {
     );
   }
 
-  Widget _buildLanguageCard(Map<String, String> lang) {
+  Widget _buildLanguageCard(Map<String, String> lang, BuildContext context) {
     bool isSelected = selectedLanguage == lang["name"];
+    final bool isDark = Theme.of(context).brightness == Brightness.dark;
     return GestureDetector(
       onTap: () => setState(() => selectedLanguage = lang["name"]!),
       child: AnimatedContainer(
@@ -168,10 +178,12 @@ class _LanguageScreenState extends State<LanguageScreen> {
         margin: const EdgeInsets.only(bottom: 12),
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: isDark ? const Color(0xFF1E1E1E) : Colors.white,
           borderRadius: BorderRadius.circular(20),
           border: Border.all(
-            color: isSelected ? Colors.black : Colors.transparent,
+            color: isSelected
+                ? (isDark ? Colors.blueAccent : Colors.black)
+                : Colors.transparent,
             width: 1.5,
           ),
           boxShadow: [
@@ -191,7 +203,7 @@ class _LanguageScreenState extends State<LanguageScreen> {
               width: 48,
               alignment: Alignment.center,
               decoration: BoxDecoration(
-                color: Colors.grey[50],
+                color: isDark ? Colors.grey[900] : Colors.grey[50],
                 borderRadius: BorderRadius.circular(14),
               ),
               child: Text(lang["flag"]!, style: const TextStyle(fontSize: 24)),
@@ -206,7 +218,7 @@ class _LanguageScreenState extends State<LanguageScreen> {
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: 16,
-                      color: isSelected ? Colors.black : Colors.black87,
+                      color: isDark ? Colors.white : Colors.black,
                     ),
                   ),
                   Text(
@@ -217,23 +229,30 @@ class _LanguageScreenState extends State<LanguageScreen> {
               ),
             ),
             if (isSelected)
-              const Icon(Icons.check_circle_rounded, color: Colors.black)
+              Icon(
+                Icons.check_circle_rounded,
+                color: isDark ? Colors.blueAccent : Colors.black,
+              )
             else
-              Icon(Icons.circle_outlined, color: Colors.grey[200]),
+              Icon(
+                Icons.circle_outlined,
+                color: isDark ? Colors.white10 : Colors.grey[200],
+              ),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildConfirmButton() {
+  Widget _buildConfirmButton(BuildContext context) {
+    final bool isDark = Theme.of(context).brightness == Brightness.dark;
     return SizedBox(
       width: double.infinity,
       height: 60,
       child: ElevatedButton(
         onPressed: () => Navigator.pop(context),
         style: ElevatedButton.styleFrom(
-          backgroundColor: Colors.black,
+          backgroundColor: isDark ? Colors.blueAccent : Colors.black,
           foregroundColor: Colors.white,
           elevation: 0,
           shape: RoundedRectangleBorder(

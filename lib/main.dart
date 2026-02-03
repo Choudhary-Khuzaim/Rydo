@@ -1,10 +1,21 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:rydo/screens/splash_screen.dart';
 import 'package:rydo/theme/theme_manager.dart';
 import 'package:rydo/database/mongodb.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Set transparent status bar
+  SystemChrome.setSystemUIOverlayStyle(
+    const SystemUiOverlayStyle(
+      statusBarColor: Colors.transparent,
+      statusBarIconBrightness: Brightness.light,
+      statusBarBrightness: Brightness.dark,
+    ),
+  );
+
   try {
     await MongoDatabase.connect();
   } catch (e) {

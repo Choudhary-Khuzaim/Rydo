@@ -80,11 +80,30 @@ class _AccountScreenState extends State<AccountScreen> {
                     CircleAvatar(
                       radius: 45,
                       backgroundColor: Colors.white.withValues(alpha: 0.2),
-                      child: const CircleAvatar(
+                      child: CircleAvatar(
                         radius: 42,
-                        backgroundImage: NetworkImage(
-                          "https://img.freepik.com/free-photo/young-bearded-man-with-striped-shirt_273609-5677.jpg",
-                        ),
+                        backgroundColor: isDark
+                            ? Colors.grey[800]
+                            : Colors.grey[200],
+                        backgroundImage:
+                            (MongoDatabase.currentUser?["profile_pic"] != null)
+                            ? NetworkImage(
+                                MongoDatabase.currentUser!["profile_pic"],
+                              )
+                            : null,
+                        child:
+                            (MongoDatabase.currentUser?["profile_pic"] == null)
+                            ? Text(
+                                (MongoDatabase.currentUser?["name"] ?? "U")
+                                    .substring(0, 1)
+                                    .toUpperCase(),
+                                style: TextStyle(
+                                  fontSize: 32,
+                                  fontWeight: FontWeight.bold,
+                                  color: isDark ? Colors.white : Colors.black,
+                                ),
+                              )
+                            : null,
                       ),
                     ),
                     const SizedBox(height: 12),

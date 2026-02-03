@@ -52,8 +52,10 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final bool isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: Stack(
         children: [
           // Background Accent Decoration
@@ -87,10 +89,10 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                       // Back Button
                       _currentPage > 0
                           ? IconButton(
-                              icon: const Icon(
+                              icon: Icon(
                                 Icons.arrow_back_ios_new,
                                 size: 20,
-                                color: Colors.black54,
+                                color: isDark ? Colors.white70 : Colors.black54,
                               ),
                               onPressed: () => _pageController.previousPage(
                                 duration: const Duration(milliseconds: 300),
@@ -104,7 +106,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                         child: Text(
                           "Skip",
                           style: TextStyle(
-                            color: Colors.black.withValues(alpha: 0.6),
+                            color: isDark
+                                ? Colors.white.withValues(alpha: 0.6)
+                                : Colors.black.withValues(alpha: 0.6),
                             fontSize: 16,
                             fontWeight: FontWeight.w600,
                           ),
@@ -129,6 +133,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                       text: _onboardingData[index]["text"] as String,
                       icon: _onboardingData[index]["icon"] as IconData,
                       accentColor: _onboardingData[index]["color"] as Color,
+                      isDark: isDark,
                     ),
                   ),
                 ),
@@ -150,8 +155,10 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                             width: _currentPage == index ? 24 : 8,
                             decoration: BoxDecoration(
                               color: _currentPage == index
-                                  ? Colors.black
-                                  : Colors.grey[300],
+                                  ? (isDark ? Colors.white : Colors.black)
+                                  : (isDark
+                                        ? Colors.grey[800]
+                                        : Colors.grey[300]),
                               borderRadius: BorderRadius.circular(5),
                             ),
                           ),
@@ -175,8 +182,12 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                             }
                           },
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.black,
-                            foregroundColor: Colors.white,
+                            backgroundColor: isDark
+                                ? Colors.white
+                                : Colors.black,
+                            foregroundColor: isDark
+                                ? Colors.black
+                                : Colors.white,
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(20),
                             ),
@@ -210,6 +221,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     required String text,
     required IconData icon,
     required Color accentColor,
+    required bool isDark,
   }) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 40),
@@ -240,10 +252,10 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
           Text(
             title,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 32,
               fontWeight: FontWeight.w900,
-              color: Colors.black,
+              color: isDark ? Colors.white : Colors.black,
               height: 1.2,
             ),
             textAlign: TextAlign.center,
@@ -253,7 +265,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             text,
             style: TextStyle(
               fontSize: 17,
-              color: Colors.black.withValues(alpha: 0.54),
+              color: isDark
+                  ? Colors.white60
+                  : Colors.black.withValues(alpha: 0.54),
               fontWeight: FontWeight.w500,
               height: 1.6,
             ),

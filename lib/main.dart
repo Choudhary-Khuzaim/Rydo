@@ -7,15 +7,6 @@ import 'package:rydo/database/mongodb.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Set transparent status bar
-  SystemChrome.setSystemUIOverlayStyle(
-    const SystemUiOverlayStyle(
-      statusBarColor: Colors.transparent,
-      statusBarIconBrightness: Brightness.light,
-      statusBarBrightness: Brightness.dark,
-    ),
-  );
-
   try {
     await MongoDatabase.connect();
   } catch (e) {
@@ -50,6 +41,11 @@ class MyApp extends StatelessWidget {
               backgroundColor: Colors.white,
               foregroundColor: Colors.black,
               elevation: 0,
+              systemOverlayStyle: SystemUiOverlayStyle(
+                statusBarColor: Colors.transparent,
+                statusBarIconBrightness: Brightness.dark,
+                statusBarBrightness: Brightness.light,
+              ),
             ),
           ),
           darkTheme: ThemeData(
@@ -66,6 +62,11 @@ class MyApp extends StatelessWidget {
               backgroundColor: Color(0xFF121212),
               foregroundColor: Colors.white,
               elevation: 0,
+              systemOverlayStyle: SystemUiOverlayStyle(
+                statusBarColor: Colors.transparent,
+                statusBarIconBrightness: Brightness.light,
+                statusBarBrightness: Brightness.dark,
+              ),
             ),
           ),
           home: const SplashScreen(),

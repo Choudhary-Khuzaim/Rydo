@@ -98,7 +98,7 @@ class _DriverDetailsScreenState extends State<DriverDetailsScreen> {
                       points: _routePoints,
                       color: isDark
                           ? Colors.blueAccent
-                          : Colors.black.withValues(alpha: 0.8),
+                          : Colors.black.withOpacity(0.8),
                       strokeWidth: 4,
                     ),
                   ],
@@ -116,7 +116,7 @@ class _DriverDetailsScreenState extends State<DriverDetailsScreen> {
                           border: Border.all(color: Colors.white, width: 3),
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.black.withValues(alpha: 0.3),
+                              color: Colors.black.withOpacity(0.3),
                               blurRadius: 10,
                             ),
                           ],
@@ -140,8 +140,8 @@ class _DriverDetailsScreenState extends State<DriverDetailsScreen> {
                             height: 20,
                             decoration: BoxDecoration(
                               color: isDark
-                                  ? Colors.blueAccent.withValues(alpha: 0.2)
-                                  : Colors.blue.withValues(alpha: 0.2),
+                                  ? Colors.blueAccent.withOpacity(0.2)
+                                  : Colors.blue.withOpacity(0.2),
                               shape: BoxShape.circle,
                             ),
                           ),
@@ -176,8 +176,8 @@ class _DriverDetailsScreenState extends State<DriverDetailsScreen> {
               decoration: BoxDecoration(
                 gradient: LinearGradient(
                   colors: isDark
-                      ? [Colors.black, Colors.black.withValues(alpha: 0)]
-                      : [Colors.white, Colors.white.withValues(alpha: 0)],
+                      ? [Colors.black, Colors.black.withOpacity(0)]
+                      : [Colors.white, Colors.white.withOpacity(0)],
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
                 ),
@@ -228,7 +228,7 @@ class _DriverDetailsScreenState extends State<DriverDetailsScreen> {
                 ),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.1),
+                    color: Colors.black.withOpacity(0.1),
                     blurRadius: 40,
                     offset: const Offset(0, -10),
                   ),
@@ -415,7 +415,7 @@ class _DriverDetailsScreenState extends State<DriverDetailsScreen> {
                           borderRadius: BorderRadius.circular(10),
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.black.withValues(alpha: 0.2),
+                              color: Colors.black.withOpacity(0.2),
                               blurRadius: 4,
                               offset: const Offset(0, 2),
                             ),

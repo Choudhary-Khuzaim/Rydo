@@ -134,7 +134,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                 child: Icon(
                   Icons.notifications,
                   size: 150,
-                  color: Colors.white.withValues(alpha: 0.05),
+                  color: Colors.white.withOpacity(0.05),
                 ),
               ),
             ],
@@ -171,7 +171,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
         borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.02),
+            color: Colors.black.withOpacity(0.02),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -182,11 +182,11 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
         child: SwitchListTile(
           value: value,
           onChanged: onChanged,
-          activeThumbColor: Colors.black,
+          activeColor: Colors.black,
           secondary: Container(
             padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
-              color: iconColor.withValues(alpha: 0.1),
+              color: iconColor.withOpacity(0.1),
               borderRadius: BorderRadius.circular(16),
             ),
             child: Icon(icon, color: iconColor, size: 24),

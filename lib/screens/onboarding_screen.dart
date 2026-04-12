@@ -69,7 +69,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 color: (_onboardingData[_currentPage]["color"] as Color)
-                    .withValues(alpha: 0.05),
+                    .withOpacity(0.05),
               ),
             ),
           ),
@@ -107,8 +107,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                           "Skip",
                           style: TextStyle(
                             color: isDark
-                                ? Colors.white.withValues(alpha: 0.6)
-                                : Colors.black.withValues(alpha: 0.6),
+                                ? Colors.white.withOpacity(0.6)
+                                : Colors.black.withOpacity(0.6),
                             fontSize: 16,
                             fontWeight: FontWeight.w600,
                           ),
@@ -233,7 +233,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             width: 220,
             height: 220,
             decoration: BoxDecoration(
-              color: accentColor.withValues(alpha: 0.1),
+              color: accentColor.withOpacity(0.1),
               shape: BoxShape.circle,
             ),
             child: Center(
@@ -241,7 +241,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 width: 160,
                 height: 160,
                 decoration: BoxDecoration(
-                  color: accentColor.withValues(alpha: 0.2),
+                  color: accentColor.withOpacity(0.2),
                   shape: BoxShape.circle,
                 ),
                 child: Icon(icon, size: 80, color: accentColor),
@@ -267,7 +267,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               fontSize: 17,
               color: isDark
                   ? Colors.white60
-                  : Colors.black.withValues(alpha: 0.54),
+                  : Colors.black.withOpacity(0.54),
               fontWeight: FontWeight.w500,
               height: 1.6,
             ),

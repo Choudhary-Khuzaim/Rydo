@@ -64,7 +64,7 @@ class _TopUpScreenState extends State<TopUpScreen> {
                       Text(
                         "Current Balance",
                         style: TextStyle(
-                          color: Colors.white.withValues(alpha: 0.6),
+                          color: Colors.white.withOpacity(0.6),
                           fontSize: 14,
                         ),
                       ),
@@ -111,7 +111,7 @@ class _TopUpScreenState extends State<TopUpScreen> {
                           boxShadow: isSelected
                               ? [
                                   BoxShadow(
-                                    color: Colors.black.withValues(alpha: 0.2),
+                                    color: Colors.black.withOpacity(0.2),
                                     blurRadius: 10,
                                     offset: const Offset(0, 4),
                                   ),
@@ -157,7 +157,7 @@ class _TopUpScreenState extends State<TopUpScreen> {
                       backgroundColor: Colors.black,
                       foregroundColor: Colors.white,
                       elevation: 4,
-                      shadowColor: Colors.black.withValues(alpha: 0.4),
+                      shadowColor: Colors.black.withOpacity(0.4),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(20),
                       ),

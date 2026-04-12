@@ -79,7 +79,7 @@ class _AccountScreenState extends State<AccountScreen> {
                     const SizedBox(height: 40),
                     CircleAvatar(
                       radius: 45,
-                      backgroundColor: Colors.white.withValues(alpha: 0.2),
+                      backgroundColor: Colors.white.withOpacity(0.2),
                       child: CircleAvatar(
                         radius: 42,
                         backgroundColor: isDark
@@ -119,7 +119,7 @@ class _AccountScreenState extends State<AccountScreen> {
                       MongoDatabase.currentUser?["email"] ??
                           "email@example.com",
                       style: TextStyle(
-                        color: Colors.white.withValues(alpha: 0.6),
+                        color: Colors.white.withOpacity(0.6),
                         fontSize: 14,
                       ),
                     ),
@@ -298,7 +298,7 @@ class _AccountScreenState extends State<AccountScreen> {
         style: TextStyle(
           fontSize: 14,
           fontWeight: FontWeight.w600,
-          color: isDark ? Colors.white38 : Colors.black.withValues(alpha: 0.4),
+          color: isDark ? Colors.white38 : Colors.black.withOpacity(0.4),
           letterSpacing: 1.2,
         ),
       ),
@@ -319,7 +319,7 @@ class _AccountScreenState extends State<AccountScreen> {
         borderRadius: BorderRadius.circular(18),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.03),
+            color: Colors.black.withOpacity(0.03),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),

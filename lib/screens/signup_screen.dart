@@ -179,7 +179,7 @@ class _SignupScreenState extends State<SignupScreen> {
               height: 250,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: Colors.white.withValues(alpha: 0.05),
+                color: Colors.white.withOpacity(0.05),
               ),
             ),
           ),
@@ -191,7 +191,7 @@ class _SignupScreenState extends State<SignupScreen> {
               height: 300,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: Colors.blueAccent.withValues(alpha: 0.08),
+                color: Colors.blueAccent.withOpacity(0.08),
               ),
             ),
           ),
@@ -226,7 +226,7 @@ class _SignupScreenState extends State<SignupScreen> {
                     "Join us today and enjoy premium rides.",
                     style: TextStyle(
                       fontSize: 16,
-                      color: Colors.white.withValues(alpha: 0.7),
+                      color: Colors.white.withOpacity(0.7),
                       fontWeight: FontWeight.w400,
                     ),
                   ),
@@ -240,10 +240,10 @@ class _SignupScreenState extends State<SignupScreen> {
                       child: Container(
                         padding: const EdgeInsets.all(24),
                         decoration: BoxDecoration(
-                          color: Colors.white.withValues(alpha: 0.1),
+                          color: Colors.white.withOpacity(0.1),
                           borderRadius: BorderRadius.circular(30),
                           border: Border.all(
-                            color: Colors.white.withValues(alpha: 0.2),
+                            color: Colors.white.withOpacity(0.2),
                             width: 1,
                           ),
                         ),
@@ -285,9 +285,7 @@ class _SignupScreenState extends State<SignupScreen> {
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: Colors.white,
                                   foregroundColor: const Color(0xFF0F2027),
-                                  shadowColor: Colors.black.withValues(
-                                    alpha: 0.3,
-                                  ),
+                                  shadowColor: Colors.black.withOpacity(0.3),
                                   elevation: 5,
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(15),
@@ -325,7 +323,7 @@ class _SignupScreenState extends State<SignupScreen> {
                       Text(
                         "Already have an account? ",
                         style: TextStyle(
-                          color: Colors.white.withValues(alpha: 0.7),
+                          color: Colors.white.withOpacity(0.7),
                         ),
                       ),
                       GestureDetector(
@@ -361,10 +359,10 @@ class _SignupScreenState extends State<SignupScreen> {
   }) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.black.withValues(alpha: 0.2),
+        color: Colors.black.withOpacity(0.2),
         borderRadius: BorderRadius.circular(15),
         border: Border.all(
-          color: Colors.white.withValues(alpha: 0.1),
+          color: Colors.white.withOpacity(0.1),
           width: 1,
         ),
       ),
@@ -392,7 +390,7 @@ class _SignupScreenState extends State<SignupScreen> {
                 )
               : null,
           hintText: hint,
-          hintStyle: TextStyle(color: Colors.white.withValues(alpha: 0.5)),
+          hintStyle: TextStyle(color: Colors.white.withOpacity(0.5)),
           border: InputBorder.none,
           contentPadding: const EdgeInsets.symmetric(
             vertical: 16,

@@ -100,7 +100,7 @@ class SendMoneyScreen extends StatelessWidget {
                   borderRadius: BorderRadius.circular(24),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.2),
+                      color: Colors.black.withOpacity(0.2),
                       blurRadius: 15,
                       offset: const Offset(0, 8),
                     ),
@@ -141,7 +141,7 @@ class SendMoneyScreen extends StatelessWidget {
                         Text(
                           "Rs. 12,500.00",
                           style: TextStyle(
-                            color: Colors.white.withValues(alpha: 0.9),
+                            color: Colors.white.withOpacity(0.9),
                             fontWeight: FontWeight.bold,
                           ),
                         ),

@@ -113,7 +113,7 @@ class FavoritesScreen extends StatelessWidget {
                 child: Icon(
                   Icons.favorite,
                   size: 200,
-                  color: Colors.white.withValues(alpha: 0.05),
+                  color: Colors.white.withOpacity(0.05),
                 ),
               ),
             ],
@@ -130,7 +130,7 @@ class FavoritesScreen extends StatelessWidget {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.04),
+            color: Colors.black.withOpacity(0.04),
             blurRadius: 15,
             offset: const Offset(0, 4),
           ),
@@ -175,7 +175,7 @@ class FavoritesScreen extends StatelessWidget {
         borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.02),
+            color: Colors.black.withOpacity(0.02),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -195,7 +195,7 @@ class FavoritesScreen extends StatelessWidget {
                     height: 56,
                     width: 56,
                     decoration: BoxDecoration(
-                      color: color.withValues(alpha: 0.1),
+                      color: color.withOpacity(0.1),
                       borderRadius: BorderRadius.circular(18),
                     ),
                     child: Icon(icon, color: color, size: 26),

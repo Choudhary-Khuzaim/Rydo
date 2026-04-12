@@ -100,7 +100,7 @@ class _RideSelectionSheetState extends State<RideSelectionSheet> {
         borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.1),
+            color: Colors.black.withOpacity(0.1),
             blurRadius: 40,
             offset: const Offset(0, -10),
           ),
@@ -246,9 +246,7 @@ class _RideSelectionSheetState extends State<RideSelectionSheet> {
                             decoration: BoxDecoration(
                               color: isSelected
                                   ? (isDark
-                                        ? Colors.blueAccent.withValues(
-                                            alpha: 0.1,
-                                          )
+                                        ? Colors.blueAccent.withOpacity(0.1)
                                         : Colors.black)
                                   : Theme.of(context).cardColor,
                               borderRadius: BorderRadius.circular(24),
@@ -270,10 +268,8 @@ class _RideSelectionSheetState extends State<RideSelectionSheet> {
                                   width: 55,
                                   decoration: BoxDecoration(
                                     color: isSelected && !isDark
-                                        ? Colors.white.withValues(alpha: 0.1)
-                                        : (option["color"] as Color).withValues(
-                                            alpha: 0.1,
-                                          ),
+                                        ? Colors.white.withOpacity(0.1)
+                                        : (option["color"] as Color).withOpacity(0.1),
                                     borderRadius: BorderRadius.circular(16),
                                   ),
                                   child: Icon(
@@ -405,7 +401,7 @@ class _RideSelectionSheetState extends State<RideSelectionSheet> {
                     borderRadius: BorderRadius.circular(24),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.2),
+                        color: Colors.black.withOpacity(0.2),
                         blurRadius: 20,
                         offset: const Offset(0, 10),
                       ),

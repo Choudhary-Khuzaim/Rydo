@@ -114,7 +114,7 @@ class _AppearanceScreenState extends State<AppearanceScreen> {
                 child: Icon(
                   Icons.palette_rounded,
                   size: 150,
-                  color: Colors.white.withValues(alpha: 0.1),
+                  color: Colors.white.withOpacity(0.1),
                 ),
               ),
             ],
@@ -164,8 +164,8 @@ class _AppearanceScreenState extends State<AppearanceScreen> {
           boxShadow: [
             BoxShadow(
               color: isSelected
-                  ? Colors.black.withValues(alpha: 0.1)
-                  : Colors.black.withValues(alpha: 0.02),
+                  ? Colors.black.withOpacity(0.1)
+                  : Colors.black.withOpacity(0.02),
               blurRadius: 15,
               offset: const Offset(0, 4),
             ),
@@ -176,7 +176,7 @@ class _AppearanceScreenState extends State<AppearanceScreen> {
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: color.withValues(alpha: 0.1),
+                color: color.withOpacity(0.1),
                 borderRadius: BorderRadius.circular(16),
               ),
               child: Icon(icon, color: color, size: 24),

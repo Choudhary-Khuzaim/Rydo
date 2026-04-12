@@ -165,7 +165,7 @@ class _SearchScreenState extends State<SearchScreen> {
           boxShadow: isEnabled
               ? [
                   BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.2),
+                    color: Colors.black.withOpacity(0.2),
                     blurRadius: 20,
                     offset: const Offset(0, 10),
                   ),
@@ -240,7 +240,7 @@ class _SearchScreenState extends State<SearchScreen> {
                 child: Icon(
                   Icons.search_rounded,
                   size: 160,
-                  color: Colors.white.withValues(alpha: 0.05),
+                  color: Colors.white.withOpacity(0.05),
                 ),
               ),
             ],
@@ -258,7 +258,7 @@ class _SearchScreenState extends State<SearchScreen> {
         borderRadius: BorderRadius.circular(32),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.04),
+            color: Colors.black.withOpacity(0.04),
             blurRadius: 20,
             offset: const Offset(0, 10),
           ),
@@ -416,7 +416,7 @@ class _SearchScreenState extends State<SearchScreen> {
             borderRadius: BorderRadius.circular(24),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withValues(alpha: 0.02),
+                color: Colors.black.withOpacity(0.02),
                 blurRadius: 10,
                 offset: const Offset(0, 4),
               ),

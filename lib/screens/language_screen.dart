@@ -118,7 +118,7 @@ class _LanguageScreenState extends State<LanguageScreen> {
                 child: Icon(
                   Icons.translate_rounded,
                   size: 150,
-                  color: Colors.white.withValues(alpha: 0.05),
+                  color: Colors.white.withOpacity(0.05),
                 ),
               ),
             ],
@@ -136,7 +136,7 @@ class _LanguageScreenState extends State<LanguageScreen> {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.04),
+            color: Colors.black.withOpacity(0.04),
             blurRadius: 15,
             offset: const Offset(0, 4),
           ),
@@ -189,8 +189,8 @@ class _LanguageScreenState extends State<LanguageScreen> {
           boxShadow: [
             BoxShadow(
               color: isSelected
-                  ? Colors.black.withValues(alpha: 0.05)
-                  : Colors.black.withValues(alpha: 0.01),
+                  ? Colors.black.withOpacity(0.05)
+                  : Colors.black.withOpacity(0.01),
               blurRadius: 10,
               offset: const Offset(0, 4),
             ),

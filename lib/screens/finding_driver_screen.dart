@@ -128,7 +128,7 @@ class _FindingDriverScreenState extends State<FindingDriverScreen>
           decoration: BoxDecoration(
             shape: BoxShape.circle,
             border: Border.all(
-              color: ringColor.withValues(alpha: 1 - _controller.value),
+              color: ringColor.withOpacity(1 - _controller.value),
               width: 2,
             ),
           ),

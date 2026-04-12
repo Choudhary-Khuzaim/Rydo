@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:rydo/screens/splash_screen.dart';
 import 'package:rydo/theme/theme_manager.dart';
 import 'package:rydo/database/mongodb.dart';
@@ -30,6 +31,7 @@ class MyApp extends StatelessWidget {
           theme: ThemeData(
             useMaterial3: true,
             brightness: Brightness.light,
+            textTheme: GoogleFonts.interTextTheme(Theme.of(context).textTheme),
             colorScheme: ColorScheme.fromSeed(
               seedColor: Colors.black,
               brightness: Brightness.light,
@@ -51,6 +53,9 @@ class MyApp extends StatelessWidget {
           darkTheme: ThemeData(
             useMaterial3: true,
             brightness: Brightness.dark,
+            textTheme: GoogleFonts.interTextTheme(
+              Theme.of(context).textTheme,
+            ).apply(bodyColor: Colors.white, displayColor: Colors.white),
             colorScheme: ColorScheme.fromSeed(
               seedColor: Colors.white,
               brightness: Brightness.dark,

@@ -79,7 +79,7 @@ class WalletScreen extends StatelessWidget {
                 child: Icon(
                   Icons.account_balance_wallet_rounded,
                   size: 160,
-                  color: Colors.white.withValues(alpha: 0.05),
+                  color: Colors.white.withOpacity(0.05),
                 ),
               ),
             ],
@@ -105,7 +105,7 @@ class WalletScreen extends StatelessWidget {
             ),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withValues(alpha: 0.15),
+                color: Colors.black.withOpacity(0.15),
                 blurRadius: 30,
                 offset: const Offset(0, 15),
               ),
@@ -144,7 +144,7 @@ class WalletScreen extends StatelessWidget {
                     height: 50,
                     width: 50,
                     decoration: BoxDecoration(
-                      color: Colors.white.withValues(alpha: 0.1),
+                      color: Colors.white.withOpacity(0.1),
                       shape: BoxShape.circle,
                     ),
                     child: const Icon(
@@ -170,7 +170,7 @@ class WalletScreen extends StatelessWidget {
                   Image.network(
                     "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2a/Mastercard-logo.svg/1280px-Mastercard-logo.svg.png",
                     height: 25,
-                    color: Colors.white.withValues(alpha: 0.8),
+                    color: Colors.white.withOpacity(0.8),
                     colorBlendMode: BlendMode.modulate,
                   ),
                 ],
@@ -247,7 +247,7 @@ class WalletScreen extends StatelessWidget {
               borderRadius: BorderRadius.circular(24),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.03),
+                  color: Colors.black.withOpacity(0.03),
                   blurRadius: 15,
                   offset: const Offset(0, 8),
                 ),
@@ -319,7 +319,7 @@ class WalletScreen extends StatelessWidget {
         borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.01),
+            color: Colors.black.withOpacity(0.01),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),

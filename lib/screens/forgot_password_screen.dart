@@ -40,7 +40,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
               height: 300,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: Colors.white.withValues(alpha: 0.05),
+                color: Colors.white.withOpacity(0.05),
               ),
             ),
           ),
@@ -52,7 +52,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
               height: 200,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: Colors.blueAccent.withValues(alpha: 0.1),
+                color: Colors.blueAccent.withOpacity(0.1),
               ),
             ),
           ),
@@ -80,10 +80,10 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                     child: Container(
                       padding: const EdgeInsets.all(20),
                       decoration: BoxDecoration(
-                        color: Colors.white.withValues(alpha: 0.1),
+                        color: Colors.white.withOpacity(0.1),
                         shape: BoxShape.circle,
                         border: Border.all(
-                          color: Colors.white.withValues(alpha: 0.2),
+                          color: Colors.white.withOpacity(0.2),
                           width: 1,
                         ),
                       ),
@@ -111,7 +111,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontSize: 16,
-                      color: Colors.white.withValues(alpha: 0.7),
+                      color: Colors.white.withOpacity(0.7),
                       height: 1.5,
                     ),
                   ),
@@ -125,10 +125,10 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                       child: Container(
                         padding: const EdgeInsets.all(32),
                         decoration: BoxDecoration(
-                          color: Colors.white.withValues(alpha: 0.1),
+                          color: Colors.white.withOpacity(0.1),
                           borderRadius: BorderRadius.circular(30),
                           border: Border.all(
-                            color: Colors.white.withValues(alpha: 0.2),
+                            color: Colors.white.withOpacity(0.2),
                             width: 1,
                           ),
                         ),
@@ -136,10 +136,10 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                           children: [
                             Container(
                               decoration: BoxDecoration(
-                                color: Colors.black.withValues(alpha: 0.2),
+                                color: Colors.black.withOpacity(0.2),
                                 borderRadius: BorderRadius.circular(15),
                                 border: Border.all(
-                                  color: Colors.white.withValues(alpha: 0.1),
+                                  color: Colors.white.withOpacity(0.1),
                                   width: 1,
                                 ),
                               ),
@@ -155,7 +155,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                                   ),
                                   hintText: "Enter your email",
                                   hintStyle: TextStyle(
-                                    color: Colors.white.withValues(alpha: 0.5),
+                                    color: Colors.white.withOpacity(0.5),
                                   ),
                                   border: InputBorder.none,
                                   contentPadding: const EdgeInsets.symmetric(
@@ -194,9 +194,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: Colors.white,
                                   foregroundColor: const Color(0xFF0F2027),
-                                  shadowColor: Colors.black.withValues(
-                                    alpha: 0.3,
-                                  ),
+                                  shadowColor: Colors.black.withOpacity(0.3),
                                   elevation: 5,
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(15),

@@ -96,10 +96,10 @@ class _SignupScreenState extends State<SignupScreen> {
 
     final userData = {
       "_id": mongo.ObjectId(),
-      "name": _nameController.text,
-      "email": _emailController.text,
-      "phone": _phoneController.text,
-      "password": _hashPassword(_passwordController.text),
+      "name": name,
+      "email": email,
+      "phone": phone,
+      "password": _hashPassword(password),
       "createdAt": DateTime.now().toIso8601String(),
     };
 

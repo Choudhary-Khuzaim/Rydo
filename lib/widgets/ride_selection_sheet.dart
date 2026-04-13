@@ -385,6 +385,7 @@ class _RideSelectionSheetState extends State<RideSelectionSheet> {
               onTap: _isBooking
                   ? null
                   : () {
+                      if (filtered.isEmpty) return;
                       setState(() => _isBooking = true);
                       final selected = filtered[_selectedIndex];
                       final price = _calculatePrice(selected["basePrice"]);
@@ -409,7 +410,7 @@ class _RideSelectionSheetState extends State<RideSelectionSheet> {
                   ),
                   child: Center(
                     child: Text(
-                      "Confirm ${filtered[_selectedIndex]["name"]}",
+                      "Confirm ${filtered.isNotEmpty ? filtered[_selectedIndex]["name"] : 'Ride'}",
                       style: const TextStyle(
                         color: Colors.white,
                         fontSize: 18,

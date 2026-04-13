@@ -54,12 +54,16 @@ class _SearchScreenState extends State<SearchScreen> {
 
   void _onSearchChanged() {
     if (_debounce?.isActive ?? false) _debounce?.cancel();
+    
+    // Capture focus state and text NOW
+    final bool searchingPickup = _isPickupFocused;
+    final String query = searchingPickup 
+        ? _pickupController.text 
+        : _dropoffController.text;
+
     _debounce = Timer(const Duration(milliseconds: 500), () {
-      final query = _isPickupFocused
-          ? _pickupController.text
-          : _dropoffController.text;
       if (query.isNotEmpty) {
-        _performSearch(query);
+        _performSearch(query, searchingPickup);
       } else {
         setState(() {
           _suggestions = [];
@@ -69,14 +73,20 @@ class _SearchScreenState extends State<SearchScreen> {
     });
   }
 
-  Future<void> _performSearch(String query) async {
+  Future<void> _performSearch(String query, bool isPickup) async {
     setState(() => _isLoading = true);
     final results = await _searchService.searchPlaces(query);
-    if (mounted) {
+    
+    // Only update if the focus hasn't changed to the other field in the meantime
+    // or if we want to show results regardless but tag them.
+    // For now, let's just make sure results are relevant.
+    if (mounted && _isPickupFocused == isPickup) {
       setState(() {
         _suggestions = results;
         _isLoading = false;
       });
+    } else if (mounted) {
+      setState(() => _isLoading = false);
     }
   }
 

@@ -76,7 +76,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
     final hashedPassword = _hashPassword(_passwordController.text);
     final user = await MongoDatabase.login(
-      _emailController.text,
+      email,
       hashedPassword,
     );
 

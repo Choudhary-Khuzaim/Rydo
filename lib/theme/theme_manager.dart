@@ -23,6 +23,8 @@ class ThemeManager {
         return "Light Mode";
       case ThemeMode.system:
         return "System Default";
+      default:
+        return "System Default";
     }
   }
 }

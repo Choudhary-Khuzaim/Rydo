@@ -30,7 +30,7 @@ class LocationService {
   }
 
   Stream<Position> getPositionStream() {
-    const LocationSettings locationSettings = LocationSettings(
+    final LocationSettings locationSettings = LocationSettings(
       accuracy: LocationAccuracy.high,
       distanceFilter: 10, // Update every 10 meters
     );

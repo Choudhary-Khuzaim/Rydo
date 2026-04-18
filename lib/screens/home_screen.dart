@@ -35,7 +35,7 @@ class _HomeScreenState extends State<HomeScreen> {
   StreamSubscription<Position>? _positionSubscription;
   Map<String, int> _distanceDuration = {"distance": 5, "duration": 15};
 
-  static const LatLng _kDefaultLocation = LatLng(
+  static final LatLng _kDefaultLocation = LatLng(
     37.42796133580664,
     -122.085749655962,
   );

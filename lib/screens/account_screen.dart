@@ -85,12 +85,14 @@ class _AccountScreenState extends State<AccountScreen> {
                         backgroundColor: isDark
                             ? Colors.grey[800]
                             : Colors.grey[200],
-                        backgroundImage:
-                            (MongoDatabase.currentUser?["profile_pic"] != null)
-                            ? NetworkImage(
-                                MongoDatabase.currentUser!["profile_pic"],
-                              )
-                            : null,
+                         backgroundImage: (MongoDatabase.currentUser?["profile_pic"] != null)
+                             ? NetworkImage(
+                                 MongoDatabase.currentUser!["profile_pic"],
+                               )
+                             : null,
+                         onBackgroundImageError: (exception, stackTrace) {
+                           // Fallback is handled by the child Text widget
+                         },
                         child:
                             (MongoDatabase.currentUser?["profile_pic"] == null)
                             ? Text(

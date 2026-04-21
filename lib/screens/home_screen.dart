@@ -28,7 +28,7 @@ class _HomeScreenState extends State<HomeScreen> {
   final LocationService _locationService = LocationService();
   LatLng? _currentPosition;
   String _currentAddress = "San Francisco";
-  List<Marker> _markers = [];
+  Map<String, Marker> _markers = {};
   List<Polyline> _polylines = [];
   bool _showFarePanel = false;
   bool _isLocating = false;
@@ -43,7 +43,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
-    _markers = [];
+    _markers = {};
     _polylines = [];
     _startLocationUpdates();
   }
@@ -111,7 +111,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
         // Update or add the user location marker
         final userMarker = Marker(
-          point: _currentPosition!,
+          point: latLng,
           width: 60,
           height: 60,
           child: Container(
@@ -141,19 +141,7 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         );
 
-        if (_showFarePanel) {
-          // If showing route, we might want to update user position
-          // but not necessarily replace the first marker which is now the pickup
-          // For now, let's just skip user marker update when route is visible
-          // or we can manage a separate list.
-          return;
-        }
-
-        if (_markers.isEmpty) {
-          _markers.add(userMarker);
-        } else {
-          _markers[0] = userMarker;
-        }
+        _markers['user'] = userMarker;
       });
     }
   }
@@ -178,45 +166,44 @@ class _HomeScreenState extends State<HomeScreen> {
       final dropoff = result['dropoff'];
 
       if (dropoff != null) {
-        final double destLat = dropoff['lat'] != 0.0
-            ? dropoff['lat']
-            : (_currentPosition?.latitude ?? _kDefaultLocation.latitude) + 0.01;
-        final double destLon = dropoff['lon'] != 0.0
-            ? dropoff['lon']
-            : (_currentPosition?.longitude ?? _kDefaultLocation.longitude) +
-                  0.01;
+        final double destLat = (dropoff['lat'] != null && dropoff['lat'] != 0.0)
+            ? double.tryParse(dropoff['lat'].toString()) ?? (_currentPosition?.latitude ?? _kDefaultLocation.latitude) + 0.005
+            : (_currentPosition?.latitude ?? _kDefaultLocation.latitude) + 0.005;
+        final double destLon = (dropoff['lon'] != null && dropoff['lon'] != 0.0)
+            ? double.tryParse(dropoff['lon'].toString()) ?? (_currentPosition?.longitude ?? _kDefaultLocation.longitude) + 0.005
+            : (_currentPosition?.longitude ?? _kDefaultLocation.longitude) + 0.005;
 
         LatLng destination = LatLng(destLat, destLon);
 
         // Handle custom pickup if provided, else use current
         LatLng pickupPoint = _currentPosition ?? _kDefaultLocation;
-        if (pickup != null && pickup['lat'] != 0.0) {
-          pickupPoint = LatLng(pickup['lat'], pickup['lon']);
+        if (pickup != null && pickup['lat'] != null && pickup['lat'] != 0.0) {
+          pickupPoint = LatLng(
+            double.tryParse(pickup['lat'].toString()) ?? pickupPoint.latitude,
+            double.tryParse(pickup['lon'].toString()) ?? pickupPoint.longitude,
+          );
         }
 
         setState(() {
           _showFarePanel = true;
-          _markers.clear();
+          _markers.remove('pickup');
+          _markers.remove('destination');
           _polylines.clear(); // Clear old routes
         });
 
         // Add Pickup & Dest Markers immediately
         setState(() {
-          _markers.add(
-            Marker(
-              point: pickupPoint,
-              width: 80,
-              height: 80,
-              child: const Icon(Icons.circle, color: Colors.blue, size: 20),
-            ),
+          _markers['pickup'] = Marker(
+            point: pickupPoint,
+            width: 80,
+            height: 80,
+            child: const Icon(Icons.circle, color: Colors.blue, size: 20),
           );
-          _markers.add(
-            Marker(
-              point: destination,
-              width: 80,
-              height: 80,
-              child: const Icon(Icons.location_on, color: Colors.red, size: 40),
-            ),
+          _markers['destination'] = Marker(
+            point: destination,
+            width: 80,
+            height: 80,
+            child: const Icon(Icons.location_on, color: Colors.red, size: 40),
           );
         });
 
@@ -242,7 +229,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
           setState(() {
             _distanceDuration = {
-              "distance": distanceKm.round(),
+              "distance": distanceKm < 1 ? 1 : distanceKm.round(),
               "duration": durationMins,
             };
             _polylines.add(
@@ -280,20 +267,8 @@ class _HomeScreenState extends State<HomeScreen> {
         setState(() {
           _showFarePanel = false;
           _polylines.clear();
-          if (_currentPosition != null) {
-            _markers = [
-              Marker(
-                point: _currentPosition!,
-                width: 80,
-                height: 80,
-                child: const Icon(
-                  Icons.location_on,
-                  color: Colors.blue,
-                  size: 40,
-                ),
-              ),
-            ];
-          }
+          _markers.remove('pickup');
+          _markers.remove('destination');
         });
       }
     });
@@ -405,7 +380,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     userAgentPackageName: OsmApi.userAgent,
                   ),
                   PolylineLayer(polylines: _polylines),
-                  MarkerLayer(markers: _markers),
+                  MarkerLayer(markers: _markers.values.toList()),
                 ],
               ),
             ),

@@ -19,11 +19,15 @@ class SearchService {
         List data = json.decode(response.body);
         return data
             .map(
-              (item) => {
-                'display_name': item['display_name'],
-                'lat': item['lat'],
-                'lon': item['lon'],
-                'name': item['name'] ?? item['display_name'].split(',')[0],
+              (item) {
+                String displayName = item['display_name'] ?? "";
+                String name = item['name'] ?? (displayName.split(',').first.isNotEmpty ? displayName.split(',').first : "Location");
+                return {
+                  'display_name': displayName,
+                  'lat': item['lat'],
+                  'lon': item['lon'],
+                  'name': name,
+                };
               },
             )
             .toList();

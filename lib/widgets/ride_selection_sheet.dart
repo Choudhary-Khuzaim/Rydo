@@ -80,8 +80,10 @@ class _RideSelectionSheetState extends State<RideSelectionSheet> {
   }
 
   double _calculatePrice(double basePrice) {
-    int distance = widget.distanceDuration["distance"] ?? 5;
-    return basePrice * distance;
+    int distance = widget.distanceDuration["distance"] ?? 1;
+    // Ensure a minimum distance of 1km for pricing and add a base charge
+    double distanceForPricing = distance < 1 ? 1.0 : distance.toDouble();
+    return (basePrice * distanceForPricing) + 15.0; // Added 15.0 as a flat base service fee
   }
 
   @override

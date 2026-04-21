@@ -172,6 +172,9 @@ class WalletScreen extends StatelessWidget {
                     height: 25,
                     color: Colors.white.withOpacity(0.8),
                     colorBlendMode: BlendMode.modulate,
+                    errorBuilder: (context, error, stackTrace) {
+                      return const Icon(Icons.credit_card, color: Colors.white54, size: 25);
+                    },
                   ),
                 ],
               ),
